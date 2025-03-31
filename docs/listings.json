@@ -10,6 +10,8 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Triton-Puzzles/Triton-Puzzles.html",
+      "/posts/llm-training-puzzles/llm-training-puzzles.html",
       "/posts/gpu-puzzles/gpu-puzzles.html",
       "/posts/tokenizers-deep-dive/tokenizers-deep-dive.html",
       "/posts/tokenizer-problems/tokenizer-problems.html",

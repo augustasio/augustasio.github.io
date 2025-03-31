@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Augustas Macijauskas - L5-B: Packing 2-bit Weights</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../assets/favicon.ico" rel="icon">
+<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1M6C1LWNHY"></script>
+
+<script type="text/plain" cookie-consent="tracking">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-1M6C1LWNHY', { 'anonymize_ip': true});
+</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<script type="application/json" class="js-hypothesis-config">
+{
+  "theme": "clean"
+}
+</script>
+<script async="" src="https://hypothes.is/embed.js"></script>
+<script>
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    document.body.classList.add('hypothesis-enabled');
+  });
+</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Augustas Macijauskas - L5-B: Packing 2-bit Weights">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Augustas Macijauskas's blog">
+<meta name="twitter:title" content="Augustas Macijauskas - L5-B: Packing 2-bit Weights">
+<meta name="twitter:description" content="">
+<meta name="twitter:creator" content="@augustasmac">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Augustas Macijauskas</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AugustasMacijauskas/" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/augustas-macijauskas/" target="_blank"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/augustasmac" target="_blank"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">L5-B: Packing 2-bit Weights</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In this lesson, you will learn how to store low precision weights through a technique called “packing”.</p>
+<section id="packing" class="level2">
+<h2 class="anchored" data-anchor-id="packing">Packing</h2>
+<div id="cell-3" class="cell" height="30" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> torch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Note:</strong> Younes will explain the below code, and walk through each iteration step. You can go through the comprehensive explanation in the markdown below after first watching Younes’s explanation.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Example Tensor: [1, 0, 3, 2]</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>    <span class="co"># 1 0 3 2 - 01 00 11 10</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="co"># Starting point of packed int8 Tensor</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>    <span class="co"># [0000 0000]</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>    </span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="co">##### First Iteration Start:</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>    <span class="co"># packed int8 Tensor State: [0000 0000]</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>    <span class="co"># 1 = 0000 0001</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>    <span class="co"># 0000 0001</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a>    <span class="co"># No left shifts in the First Iteration</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a>    <span class="co"># After bit-wise OR operation between 0000 0000 and 0000 0001:</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>    <span class="co"># packed int8 Tensor State: 0000 0001</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a>    <span class="co">##### First Iteration End</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a></span>
+<span id="cb2-16"><a href="#cb2-16"></a>    <span class="co">##### Second Iteration Start:</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a>    <span class="co"># packed int8 Tensor State: [0000 0001]</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a>    <span class="co"># 0 = 0000 0000</span></span>
+<span id="cb2-19"><a href="#cb2-19"></a>    <span class="co"># 0000 0000</span></span>
+<span id="cb2-20"><a href="#cb2-20"></a>    <span class="co"># 2 left shifts:</span></span>
+<span id="cb2-21"><a href="#cb2-21"></a>    <span class="co"># [0000 0000] (1 shift)-&gt; 0000 0000 (2 shift)-&gt; 0000 0000</span></span>
+<span id="cb2-22"><a href="#cb2-22"></a>    <span class="co"># After bit-wise OR operation between 0000 0001 and 0000 0000:</span></span>
+<span id="cb2-23"><a href="#cb2-23"></a>    <span class="co"># packed int8 Tensor State: 0000 0001</span></span>
+<span id="cb2-24"><a href="#cb2-24"></a>    <span class="co">##### Second Iteration End</span></span>
+<span id="cb2-25"><a href="#cb2-25"></a></span>
+<span id="cb2-26"><a href="#cb2-26"></a>    <span class="co">##### Third Iteration Start:</span></span>
+<span id="cb2-27"><a href="#cb2-27"></a>    <span class="co"># packed int8 Tensor State: [0000 0001]</span></span>
+<span id="cb2-28"><a href="#cb2-28"></a>    <span class="co"># 3 = 0000 0011</span></span>
+<span id="cb2-29"><a href="#cb2-29"></a>    <span class="co"># 0000 0011</span></span>
+<span id="cb2-30"><a href="#cb2-30"></a>    <span class="co"># 4 left shifts:</span></span>
+<span id="cb2-31"><a href="#cb2-31"></a>    <span class="co"># [0000 0011] (1 shift)-&gt; 0000 0110 (2 shift)-&gt; 0000 1100</span></span>
+<span id="cb2-32"><a href="#cb2-32"></a>    <span class="co"># 0000 1100 (3 shift)-&gt; 0001 1000 (4 shift)-&gt; 0011 0000</span></span>
+<span id="cb2-33"><a href="#cb2-33"></a>    <span class="co"># After bit-wise OR operation between 0000 0001 and 0011 0000:</span></span>
+<span id="cb2-34"><a href="#cb2-34"></a>    <span class="co"># packed int8 Tensor State: 0011 0001</span></span>
+<span id="cb2-35"><a href="#cb2-35"></a>    <span class="co">##### Third Iteration End</span></span>
+<span id="cb2-36"><a href="#cb2-36"></a></span>
+<span id="cb2-37"><a href="#cb2-37"></a>    <span class="co">##### Fourth Iteration Start:</span></span>
+<span id="cb2-38"><a href="#cb2-38"></a>    <span class="co"># packed int8 Tensor State: [0011 0001]</span></span>
+<span id="cb2-39"><a href="#cb2-39"></a>    <span class="co"># 2 = 0000 0010</span></span>
+<span id="cb2-40"><a href="#cb2-40"></a>    <span class="co"># 0000 0010</span></span>
+<span id="cb2-41"><a href="#cb2-41"></a>    <span class="co"># 6 left shifts:</span></span>
+<span id="cb2-42"><a href="#cb2-42"></a>    <span class="co"># [0000 0010] (1 shift)-&gt; 0000 0100 (2 shift)-&gt; 0000 1000</span></span>
+<span id="cb2-43"><a href="#cb2-43"></a>    <span class="co"># 0000 1000 (3 shift)-&gt; 0001 0000 (4 shift)-&gt; 0010 0000</span></span>
+<span id="cb2-44"><a href="#cb2-44"></a>    <span class="co"># 0010 0000 (5 shift)-&gt; 0100 0000 (6 shift)-&gt; 1000 0000</span></span>
+<span id="cb2-45"><a href="#cb2-45"></a>    <span class="co"># After bit-wise OR operation between 0011 0001 and 1000 0000:</span></span>
+<span id="cb2-46"><a href="#cb2-46"></a>    <span class="co"># packed int8 Tensor State: 1011 0001</span></span>
+<span id="cb2-47"><a href="#cb2-47"></a>    <span class="co">##### Fourth Iteration End</span></span>
+<span id="cb2-48"><a href="#cb2-48"></a>    </span>
+<span id="cb2-49"><a href="#cb2-49"></a>    <span class="co"># Final packed int8 Tensor State: [1011 0001]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-5" class="cell" data-executioninfo="{&quot;elapsed&quot;:218,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1705676413805,&quot;user&quot;:{&quot;displayName&quot;:&quot;Younes Belkada&quot;,&quot;userId&quot;:&quot;15414910276690549281&quot;},&quot;user_tz&quot;:0}" height="523" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">def</span> pack_weights(uint8tensor, bits):</span>
+<span id="cb3-2"><a href="#cb3-2"></a>    <span class="cf">if</span> uint8tensor.shape[<span class="dv">0</span>] <span class="op">*</span> bits <span class="op">%</span> <span class="dv">8</span> <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb3-3"><a href="#cb3-3"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"The input shape needs to be a mutiple of </span><span class="sc">{</span><span class="dv">8</span> <span class="op">/</span> bits<span class="sc">}</span><span class="ss"> - got </span><span class="sc">{</span>uint8tensor<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a></span>
+<span id="cb3-5"><a href="#cb3-5"></a>    num_values <span class="op">=</span> uint8tensor.shape[<span class="dv">0</span>] <span class="op">*</span> bits <span class="op">//</span> <span class="dv">8</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7"></a>    num_steps <span class="op">=</span> <span class="dv">8</span> <span class="op">//</span> bits</span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a>    unpacked_idx <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a></span>
+<span id="cb3-11"><a href="#cb3-11"></a>    packed_tensor <span class="op">=</span> torch.zeros((num_values), dtype<span class="op">=</span>torch.uint8)</span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a>    <span class="co"># 1 0 3 2 - 01 00 11 10</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a></span>
+<span id="cb3-15"><a href="#cb3-15"></a>    <span class="co"># [0000 0000] -&gt; 0000 0001</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a></span>
+<span id="cb3-17"><a href="#cb3-17"></a>    <span class="co"># 0000 0001</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a></span>
+<span id="cb3-19"><a href="#cb3-19"></a>    <span class="co"># 0000 0000 - 0000 0000</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a></span>
+<span id="cb3-21"><a href="#cb3-21"></a>    <span class="co"># 0000 0011 - 0011 0000 - 0011 0001</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a></span>
+<span id="cb3-23"><a href="#cb3-23"></a>    <span class="co"># 1011 0001</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a></span>
+<span id="cb3-25"><a href="#cb3-25"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(num_values):</span>
+<span id="cb3-26"><a href="#cb3-26"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(num_steps):</span>
+<span id="cb3-27"><a href="#cb3-27"></a>            packed_tensor[i] <span class="op">|=</span> uint8tensor[unpacked_idx] <span class="op">&lt;&lt;</span> (bits <span class="op">*</span> j)</span>
+<span id="cb3-28"><a href="#cb3-28"></a>            unpacked_idx <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a>    <span class="cf">return</span> packed_tensor</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-6" class="cell" height="47" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>unpacked_tensor <span class="op">=</span> torch.tensor([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">2</span>], dtype<span class="op">=</span>torch.uint8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-7" class="cell" data-executioninfo="{&quot;elapsed&quot;:214,&quot;status&quot;:&quot;ok&quot;,&quot;timestamp&quot;:1705676415692,&quot;user&quot;:{&quot;displayName&quot;:&quot;Younes Belkada&quot;,&quot;userId&quot;:&quot;15414910276690549281&quot;},&quot;user_tz&quot;:0}" height="30" data-outputid="f50ccb6b-8ec4-47dc-91c1-bc70db8aafa8" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>pack_weights(unpacked_tensor, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>tensor([177], dtype=torch.uint8)</code></pre>
+</div>
+</div>
+<div id="cell-8" class="cell" height="47" data-execution_count="65">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>unpacked_tensor <span class="op">=</span> torch.tensor([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>], dtype<span class="op">=</span>torch.uint8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-9" class="cell" height="30" data-execution_count="66">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>pack_weights(unpacked_tensor, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="66">
+<pre><code>tensor([177, 255], dtype=torch.uint8)</code></pre>
+</div>
+</div>
+<div id="cell-10" class="cell" height="30" data-execution_count="86">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">def</span> pack_weights_2(uint8tensor, bits):</span>
+<span id="cb10-2"><a href="#cb10-2"></a>    <span class="cf">if</span> uint8tensor.shape[<span class="dv">0</span>] <span class="op">*</span> bits <span class="op">%</span> <span class="dv">8</span> <span class="op">!=</span> <span class="dv">0</span>:</span>
+<span id="cb10-3"><a href="#cb10-3"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"The input shape needs to be a mutiple of </span><span class="sc">{</span><span class="dv">8</span> <span class="op">/</span> bits<span class="sc">}</span><span class="ss"> - got </span><span class="sc">{</span>uint8tensor<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a>    num_values <span class="op">=</span> uint8tensor.shape[<span class="dv">0</span>] <span class="op">*</span> bits <span class="op">//</span> <span class="dv">8</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a></span>
+<span id="cb10-7"><a href="#cb10-7"></a>    num_steps <span class="op">=</span> <span class="dv">8</span> <span class="op">//</span> bits</span>
+<span id="cb10-8"><a href="#cb10-8"></a></span>
+<span id="cb10-9"><a href="#cb10-9"></a>    unpacked_idx <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a></span>
+<span id="cb10-11"><a href="#cb10-11"></a>    packed_tensor <span class="op">=</span> torch.zeros((num_values), dtype<span class="op">=</span>torch.uint8)</span>
+<span id="cb10-12"><a href="#cb10-12"></a></span>
+<span id="cb10-13"><a href="#cb10-13"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(num_values):</span>
+<span id="cb10-14"><a href="#cb10-14"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(num_steps):</span>
+<span id="cb10-15"><a href="#cb10-15"></a>            packed_tensor[i] <span class="op">=</span> (packed_tensor[i] <span class="op">&lt;&lt;</span> bits) <span class="op">+</span> uint8tensor[unpacked_idx]</span>
+<span id="cb10-16"><a href="#cb10-16"></a>            unpacked_idx <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb10-17"><a href="#cb10-17"></a></span>
+<span id="cb10-18"><a href="#cb10-18"></a>    <span class="cf">return</span> packed_tensor</span>
+<span id="cb10-19"><a href="#cb10-19"></a></span>
+<span id="cb10-20"><a href="#cb10-20"></a></span>
+<span id="cb10-21"><a href="#cb10-21"></a><span class="kw">def</span> unpack_weights_2(uint8tensor, bits):</span>
+<span id="cb10-22"><a href="#cb10-22"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>uint8tensor<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-23"><a href="#cb10-23"></a></span>
+<span id="cb10-24"><a href="#cb10-24"></a>    num_steps <span class="op">=</span> <span class="dv">8</span> <span class="op">//</span> bits</span>
+<span id="cb10-25"><a href="#cb10-25"></a></span>
+<span id="cb10-26"><a href="#cb10-26"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>num_steps<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-27"><a href="#cb10-27"></a></span>
+<span id="cb10-28"><a href="#cb10-28"></a>    unpacked_tensor <span class="op">=</span> torch.zeros((uint8tensor.shape[<span class="dv">0</span>] <span class="op">*</span> num_steps), dtype<span class="op">=</span>torch.uint8)</span>
+<span id="cb10-29"><a href="#cb10-29"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>unpacked_tensor<span class="sc">.</span>shape<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-30"><a href="#cb10-30"></a></span>
+<span id="cb10-31"><a href="#cb10-31"></a>    unpacked_idx <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb10-32"><a href="#cb10-32"></a></span>
+<span id="cb10-33"><a href="#cb10-33"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(uint8tensor.shape[<span class="dv">0</span>]):</span>
+<span id="cb10-34"><a href="#cb10-34"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(num_steps):</span>
+<span id="cb10-35"><a href="#cb10-35"></a>            <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>unpacked_idx<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-36"><a href="#cb10-36"></a>            unpacked_tensor[unpacked_idx] <span class="op">=</span> (uint8tensor[i] <span class="op">&gt;&gt;</span> (bits <span class="op">*</span> j))</span>
+<span id="cb10-37"><a href="#cb10-37"></a>            unpacked_idx <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb10-38"><a href="#cb10-38"></a></span>
+<span id="cb10-39"><a href="#cb10-39"></a>    mask <span class="op">=</span> (<span class="dv">1</span> <span class="op">&lt;&lt;</span> bits) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb10-40"><a href="#cb10-40"></a>    unpacked_tensor <span class="op">&amp;=</span> mask</span>
+<span id="cb10-41"><a href="#cb10-41"></a>    <span class="cf">return</span> unpacked_tensor</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-11" class="cell" data-execution_count="87">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="bu">print</span>(unpacked_tensor)</span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a>packed_tensor <span class="op">=</span> pack_weights_2(unpacked_tensor, <span class="dv">2</span>)</span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="bu">print</span>(packed_tensor)</span>
+<span id="cb11-5"><a href="#cb11-5"></a></span>
+<span id="cb11-6"><a href="#cb11-6"></a>unpacked_packed_tensor <span class="op">=</span> unpack_weights_2(packed_tensor, <span class="dv">2</span>)</span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="bu">print</span>(unpacked_packed_tensor)</span>
+<span id="cb11-8"><a href="#cb11-8"></a></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="cf">assert</span> torch.<span class="bu">all</span>(unpacked_packed_tensor <span class="op">==</span> unpacked_tensor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tensor([1, 0, 3, 2, 3, 3, 3, 3], dtype=torch.uint8)
+tensor([ 78, 255], dtype=torch.uint8)
+uint8tensor.shape[0]=2
+num_steps=4
+unpacked_tensor.shape=torch.Size([8])
+unpacked_idx=0
+unpacked_idx=1
+unpacked_idx=2
+unpacked_idx=3
+unpacked_idx=4
+unpacked_idx=5
+unpacked_idx=6
+unpacked_idx=7
+tensor([2, 3, 0, 1, 3, 3, 3, 3], dtype=torch.uint8)</code></pre>
+</div>
+<div class="cell-output cell-output-error">
+<pre><code>AssertionError: </code></pre>
+</div>
+</div>
+<div id="cell-12" class="cell" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">def</span> pack_weights_3(intweights: torch.Tensor, bits: <span class="bu">int</span>) <span class="op">-&gt;</span> torch.Tensor:</span>
+<span id="cb14-2"><a href="#cb14-2"></a>    <span class="co">"""</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="co">    Pack int4 / int2 weights in a uint8 tensor</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="co">    What packing means? Assume we have 4 values that are in 2bit but encoded in 8bit</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="co">    (because torch does not have native support for 2-bit datatypes)</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="co">    &gt; 0000 0011 | 0000 0010 | 0000 0001 | 0000 0000</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a></span>
+<span id="cb14-10"><a href="#cb14-10"></a><span class="co">    We can pack them in a single 8-bit uint value</span></span>
+<span id="cb14-11"><a href="#cb14-11"></a></span>
+<span id="cb14-12"><a href="#cb14-12"></a><span class="co">    &gt; 1110 0100</span></span>
+<span id="cb14-13"><a href="#cb14-13"></a></span>
+<span id="cb14-14"><a href="#cb14-14"></a><span class="co">    Therefore instead of saving 4 values in 8-bit precision we save a single value of 8-bit precision saving 24 bits in total.</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a></span>
+<span id="cb14-16"><a href="#cb14-16"></a><span class="co">    Args:</span></span>
+<span id="cb14-17"><a href="#cb14-17"></a><span class="co">        intweights (`torch.Tensor`):</span></span>
+<span id="cb14-18"><a href="#cb14-18"></a><span class="co">            The un-packed `torch.uint8` tensor</span></span>
+<span id="cb14-19"><a href="#cb14-19"></a><span class="co">        bits (`int`):</span></span>
+<span id="cb14-20"><a href="#cb14-20"></a><span class="co">            The actual `bits` - can be 2, 4</span></span>
+<span id="cb14-21"><a href="#cb14-21"></a><span class="co">    """</span></span>
+<span id="cb14-22"><a href="#cb14-22"></a>    original_shape <span class="op">=</span> intweights.shape</span>
+<span id="cb14-23"><a href="#cb14-23"></a>    values_per_item <span class="op">=</span> <span class="dv">8</span> <span class="op">//</span> bits</span>
+<span id="cb14-24"><a href="#cb14-24"></a>    row_dim <span class="op">=</span> (original_shape[<span class="dv">0</span>] <span class="op">+</span> values_per_item <span class="op">-</span> <span class="dv">1</span>) <span class="op">//</span> values_per_item</span>
+<span id="cb14-25"><a href="#cb14-25"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>original_shape[<span class="dv">0</span>]<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-26"><a href="#cb14-26"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>values_per_item<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-27"><a href="#cb14-27"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>row_dim<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-28"><a href="#cb14-28"></a></span>
+<span id="cb14-29"><a href="#cb14-29"></a>    <span class="cf">if</span> <span class="bu">len</span>(original_shape) <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb14-30"><a href="#cb14-30"></a>        packed_tensor_shape <span class="op">=</span> (row_dim,)</span>
+<span id="cb14-31"><a href="#cb14-31"></a>    <span class="cf">else</span>:</span>
+<span id="cb14-32"><a href="#cb14-32"></a>        packed_tensor_shape <span class="op">=</span> (row_dim, <span class="op">*</span>original_shape[<span class="dv">1</span>:])</span>
+<span id="cb14-33"><a href="#cb14-33"></a></span>
+<span id="cb14-34"><a href="#cb14-34"></a>    packed <span class="op">=</span> torch.zeros(packed_tensor_shape, device<span class="op">=</span>intweights.device, dtype<span class="op">=</span>torch.uint8)</span>
+<span id="cb14-35"><a href="#cb14-35"></a>    unpacked <span class="op">=</span> intweights.to(torch.uint8)</span>
+<span id="cb14-36"><a href="#cb14-36"></a></span>
+<span id="cb14-37"><a href="#cb14-37"></a>    <span class="kw">def</span> lshift(t: torch.Tensor, bits: <span class="bu">int</span>):</span>
+<span id="cb14-38"><a href="#cb14-38"></a>        <span class="cf">if</span> t.device.<span class="bu">type</span> <span class="op">==</span> <span class="st">"mps"</span>:</span>
+<span id="cb14-39"><a href="#cb14-39"></a>            <span class="co"># lshift is not supported on MPS device</span></span>
+<span id="cb14-40"><a href="#cb14-40"></a>            <span class="cf">return</span> t <span class="op">*</span> (<span class="dv">2</span><span class="op">**</span>bits)</span>
+<span id="cb14-41"><a href="#cb14-41"></a>        <span class="cf">return</span> t <span class="op">&lt;&lt;</span> bits</span>
+<span id="cb14-42"><a href="#cb14-42"></a></span>
+<span id="cb14-43"><a href="#cb14-43"></a>    <span class="bu">print</span>(<span class="st">"---"</span>)</span>
+<span id="cb14-44"><a href="#cb14-44"></a>    it <span class="op">=</span> <span class="bu">min</span>(values_per_item, (original_shape[<span class="dv">0</span>] <span class="op">//</span> row_dim) <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb14-45"><a href="#cb14-45"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(it):</span>
+<span id="cb14-46"><a href="#cb14-46"></a>        start <span class="op">=</span> i <span class="op">*</span> row_dim</span>
+<span id="cb14-47"><a href="#cb14-47"></a>        end <span class="op">=</span> <span class="bu">min</span>(start <span class="op">+</span> row_dim, original_shape[<span class="dv">0</span>])</span>
+<span id="cb14-48"><a href="#cb14-48"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>start<span class="op">=</span><span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>end<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-49"><a href="#cb14-49"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>unpacked[start:end]<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-50"><a href="#cb14-50"></a>        <span class="bu">print</span>(bits <span class="op">*</span> i)</span>
+<span id="cb14-51"><a href="#cb14-51"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>lshift(unpacked[start:end], bits <span class="op">*</span> i)<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-52"><a href="#cb14-52"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>packed[: (end <span class="op">-</span> start)]<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-53"><a href="#cb14-53"></a>        packed[: (end <span class="op">-</span> start)] <span class="op">|=</span> lshift(unpacked[start:end], bits <span class="op">*</span> i)</span>
+<span id="cb14-54"><a href="#cb14-54"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
+<span id="cb14-55"><a href="#cb14-55"></a></span>
+<span id="cb14-56"><a href="#cb14-56"></a>    <span class="cf">return</span> packed</span>
+<span id="cb14-57"><a href="#cb14-57"></a></span>
+<span id="cb14-58"><a href="#cb14-58"></a></span>
+<span id="cb14-59"><a href="#cb14-59"></a><span class="bu">print</span>(unpacked_tensor)</span>
+<span id="cb14-60"><a href="#cb14-60"></a>pack_weights_3(unpacked_tensor, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tensor([1, 0, 3, 2, 3, 3, 3, 3], dtype=torch.uint8)
+original_shape[0]=8
+values_per_item=4
+row_dim=2
+---
+start=0, end=2
+unpacked[start:end]=tensor([1, 0], dtype=torch.uint8)
+0
+lshift(unpacked[start:end], bits * i)=tensor([1, 0], dtype=torch.uint8)
+packed[: (end - start)]=tensor([0, 0], dtype=torch.uint8)
+---
+start=2, end=4
+unpacked[start:end]=tensor([3, 2], dtype=torch.uint8)
+2
+lshift(unpacked[start:end], bits * i)=tensor([12,  8], dtype=torch.uint8)
+packed[: (end - start)]=tensor([1, 0], dtype=torch.uint8)
+---
+start=4, end=6
+unpacked[start:end]=tensor([3, 3], dtype=torch.uint8)
+4
+lshift(unpacked[start:end], bits * i)=tensor([48, 48], dtype=torch.uint8)
+packed[: (end - start)]=tensor([13,  8], dtype=torch.uint8)
+---
+start=6, end=8
+unpacked[start:end]=tensor([3, 3], dtype=torch.uint8)
+6
+lshift(unpacked[start:end], bits * i)=tensor([192, 192], dtype=torch.uint8)
+packed[: (end - start)]=tensor([61, 56], dtype=torch.uint8)
+---</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="81">
+<pre><code>tensor([253, 248], dtype=torch.uint8)</code></pre>
+</div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a>pack_weights_3(torch.randint(<span class="dv">0</span>, <span class="dv">3</span>, (<span class="dv">8</span>, <span class="dv">8</span>)), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>original_shape[0]=8
+values_per_item=4
+row_dim=2
+start=0, end=2
+unpacked[start:end]=tensor([[1, 1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 1, 2, 0]], dtype=torch.uint8)
+start=2, end=4
+unpacked[start:end]=tensor([[2, 2, 1, 2, 0, 1, 0, 2],
+        [0, 0, 0, 2, 0, 0, 2, 1]], dtype=torch.uint8)
+start=4, end=6
+unpacked[start:end]=tensor([[2, 2, 2, 1, 0, 2, 1, 0],
+        [0, 0, 2, 2, 0, 0, 1, 2]], dtype=torch.uint8)
+start=6, end=8
+unpacked[start:end]=tensor([[1, 2, 2, 0, 0, 0, 1, 0],
+        [0, 2, 1, 1, 2, 0, 0, 1]], dtype=torch.uint8)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="74">
+<pre><code>tensor([[105, 169, 164,  24,   0,  36,  80,   9],
+        [  1, 128,  96, 104, 129,   1,  26, 100]], dtype=torch.uint8)</code></pre>
+</div>
+</div>
+<div id="cell-14" class="cell" height="30" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="cf">assert</span> (pack_weights(unpacked_tensor, <span class="dv">2</span>) <span class="op">==</span> pack_weights_2(unpacked_tensor, <span class="dv">2</span>)).<span class="bu">all</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>AssertionError: </code></pre>
+</div>
+</div>
+<div id="cell-15" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>large_unpacked_tensor <span class="op">=</span> torch.randint(<span class="dv">0</span>, <span class="dv">3</span>, (<span class="dv">1024</span>, ), dtype<span class="op">=</span>torch.uint8)</span>
+<span id="cb22-2"><a href="#cb22-2"></a>large_unpacked_tensor</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>tensor([2, 1, 0,  ..., 1, 0, 0], dtype=torch.uint8)</code></pre>
+</div>
+</div>
+<div id="cell-16" class="cell" data-execution_count="63">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="cf">assert</span> (pack_weights(unpacked_tensor, <span class="dv">2</span>) <span class="op">==</span> pack_weights_2(unpacked_tensor, <span class="dv">2</span>)).<span class="bu">all</span>()</span>
+<span id="cb24-2"><a href="#cb24-2"></a></span>
+<span id="cb24-3"><a href="#cb24-3"></a>pack_weights_2(large_unpacked_tensor, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>AssertionError: </code></pre>
+</div>
+</div>
+<div id="cell-17" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a><span class="op">%</span>timeit pack_weights(large_unpacked_tensor, <span class="dv">2</span>)</span>
+<span id="cb26-2"><a href="#cb26-2"></a><span class="op">%</span>timeit pack_weights_2(large_unpacked_tensor, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>5.16 ms ± 60.2 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+5.13 ms ± 27.1 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+
+<div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

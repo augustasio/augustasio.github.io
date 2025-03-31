@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Augustas Macijauskas">
+<meta name="dcterms.date" content="2024-05-15">
+<meta name="description" content="A Llama 3 tokenizer implemented using the tiktoken library can bring up to Xx gains in tokenization speed.">
+
+<title>Augustas Macijauskas - Speeding up the Llama 3 tokenizer</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../assets/favicon.ico" rel="icon">
+<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1M6C1LWNHY"></script>
+
+<script type="text/plain" cookie-consent="tracking">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-1M6C1LWNHY', { 'anonymize_ip': true});
+</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<script type="application/json" class="js-hypothesis-config">
+{
+  "theme": "clean"
+}
+</script>
+<script async="" src="https://hypothes.is/embed.js"></script>
+<script>
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    document.body.classList.add('hypothesis-enabled');
+  });
+</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Augustas Macijauskas - Speeding up the Llama 3 tokenizer">
+<meta property="og:description" content="A Llama 3 tokenizer implemented using the tiktoken library can bring up to Xx gains in tokenization speed.">
+<meta property="og:image" content="dalle-3-tokenization-fast.webp">
+<meta property="og:site_name" content="Augustas Macijauskas's blog">
+<meta name="twitter:title" content="Augustas Macijauskas - Speeding up the Llama 3 tokenizer">
+<meta name="twitter:description" content="A Llama 3 tokenizer implemented using the tiktoken library can bring up to Xx gains in tokenization speed.">
+<meta name="twitter:image" content="dalle-3-tokenization-fast.webp">
+<meta name="twitter:creator" content="@augustasmac">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Augustas Macijauskas</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/AugustasMacijauskas/" target="_blank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/augustas-macijauskas/" target="_blank"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/augustasmac" target="_blank"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Speeding up the Llama 3 tokenizer</h1>
+                  <div>
+        <div class="description">
+          A Llama 3 tokenizer implemented using the tiktoken library can bring up to Xx gains in tokenization speed.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">deep learning</div>
+                <div class="quarto-category">LLMs</div>
+                <div class="quarto-category">tokenization</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Augustas Macijauskas </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 15, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#warm-up-basics-of-tokenization" id="toc-warm-up-basics-of-tokenization" class="nav-link active" data-scroll-target="#warm-up-basics-of-tokenization">Warm-up: basics of tokenization</a></li>
+  <li><a href="#training-a-llama-3-tokenizer" id="toc-training-a-llama-3-tokenizer" class="nav-link" data-scroll-target="#training-a-llama-3-tokenizer">Training a Llama 3 tokenizer</a>
+  <ul class="collapse">
+  <li><a href="#assembling-a-llama-3-tokenizer-ourselves" id="toc-assembling-a-llama-3-tokenizer-ourselves" class="nav-link" data-scroll-target="#assembling-a-llama-3-tokenizer-ourselves">Assembling a Llama 3 tokenizer ourselves</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
+  <li><a href="#sec-next-steps" id="toc-sec-next-steps" class="nav-link" data-scroll-target="#sec-next-steps">Open questions (for the curious reader)</a></li>
+  <li><a href="#sources" id="toc-sources" class="nav-link" data-scroll-target="#sources">Sources</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>In the conclusion of my <a href="../tokenizer-problems/tokenizer-problems.html" target="_blank">recent blog post</a> I argued that I disagree with Andrej Karpathy’s claims about the current state of tokenizer availability and tooling. In particular:</p>
+<ul>
+<li>I do not agree that there are no good alternatives to OpenAI’s GPT-4 tokenizer and their <code>tiktoken</code> library, especially since the <a href="https://ai.meta.com/blog/meta-llama-3/" target="_blank">release of Llama 3</a>.</li>
+<li>Also, it is not the case that there are no good tools to train tokenizers from scratch fast, as the <code>tokenizers</code> library from Hugging Face has the functionality for both training and running tokenizers in inference mode. It is built in Rust, so it is extremely fast, and has reasonably approachable documentation.</li>
+</ul>
+<p>This prompted me to do a deep dive into tokenizers and how one would go about building one from scratch. Inspired by the <a href="https://www.fast.ai/posts/2016-10-08-teaching-philosophy.html#good-education-starts-with-the-whole-game" target="_blank">top-down approach</a> from Jeremy Howard, whose courses I enjoy a lot, this blog post will start with the very basics of tokenizers and then focus on how to train a Llama 3-like tokenizer on your own data with as little code as possible. Finally, we will explore what influence different proportions of English/non-English/code data have on the final vocabulary learnt by the tokenizer, as well as discuss a paper on how tokenizer design choices impact the downstream performance of the LLM.</p>
+<p>In the second part, we will explore what influence different proportions of English/non-English/code data have on the final vocabulary learnt by the tokenizer, as well as discuss a paper on how tokenizer design choices impact the downstream performance of the LLM, so stay tuned! Now, let’s jump right in!.</p>
+<section id="warm-up-basics-of-tokenization" class="level1">
+<h1>Warm-up: basics of tokenization</h1>
+<p>I am mostly assuming that if you found and opened this article, you have at least a basic understanding of what tokenization is and what its purpose is, but let’s do a quick revision just to make sure we are all on the same page.</p>
+<p><strong>Why do we need tokenization in the first place?</strong></p>
+<ol type="1">
+<li>Majority of machine learning models operate on numbers, and (large) language models are no exception.</li>
+<li>Whether it is natural language, code, or something else, we want to be able to input strings into the language models.</li>
+<li>This is where tokenization comes in, it is a <strong>process of converting strings of text into numbers</strong> that can then be fed into language models.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This last point is actually the reason why the current state-of-the-art language models are not actually end-to-end systems.</p>
+</div>
+</div>
+<p><strong>How do tokenizers work on a high level?</strong></p>
+<ol type="1">
+<li>First, the long input string is split into smaller chunks called <em>tokens</em>.</li>
+<li>Then, a <em>vocabulary</em>, which is a mapping from known tokens to integers, is used to convert the tokens to integer ids.</li>
+<li>These ids can be fed as input into language models.</li>
+</ol>
+<p><strong>What are some qualities that we want our tokenizers to have?</strong></p>
+<p>We want our tokenizers to be able to process various kinds of inputs. In this article, we will not be able to fully dig into the various design choices made when building tokenizers to achieve this, but here is a (likely non-exhaustive) list of qualities that we want the tokenizers to have:</p>
+<ol type="1">
+<li>They should work on both English and non-English texts, both uppercase and lowercase, both Latin and non-Latin alphabet.</li>
+<li>They should be able to handle various kinds of special characters that we might find in the wild, such as emojis 🤗.</li>
+<li>They should be able to handle code.</li>
+<li>(Optional) They should be able to tokenize unseen words without the need to include a special <code>&lt;unk&gt;</code> token in their vocabulary.</li>
+</ol>
+<p><strong>How does this look in code?</strong></p>
+<p>Before diving into training a tokenizer, let’s illustrate some of the aspects described above in code. We will find that all of the above is very simple to do by using the <code>tokenizers</code> library!</p>
+<div id="cell-4" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">%</span>load_ext autoreload</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="op">%</span>autoreload <span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-5" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">import</span> json</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="im">from</span> pprint <span class="im">import</span> pprint</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="im">from</span> tokenizers <span class="im">import</span> (</span>
+<span id="cb2-4"><a href="#cb2-4"></a>    Tokenizer, Regex, models, pre_tokenizers, processors, decoders</span>
+<span id="cb2-5"><a href="#cb2-5"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-6" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># This code will only be used later when training a tokenizer</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"wikitext"</span>, <span class="st">"wikitext-103-raw-v1"</span>, split<span class="op">=</span><span class="st">"train"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="bu">len</span>(dataset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-7" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>model_id <span class="op">=</span> <span class="st">"meta-llama/Meta-Llama-3-8B-Instruct"</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now that we have a tokenizer defined, let’s see how we can tokenizer a piece of text:</p>
+<div id="cell-9" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>text <span class="op">=</span> <span class="st">"Hello world, we're live 🤗."</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>tokens <span class="op">=</span> tokenizer.tokenize(text)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>tokens</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>['Hello', 'Ġworld', ',', 'Ġwe', "'re", 'Ġlive', 'ĠðŁ', '¤', 'Ĺ', '.']</code></pre>
+</div>
+</div>
+<p>We can see that the string was split into smaller tokens. The <code>Ġ</code> is how the <code>Llama 3</code> tokenizer represents spaces in its vocabulary, so you can actually think of the tokens as <code>text</code>, <code>to</code>, etc.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It turns out that it is very likely that nowadays the use of the <code>Ġ</code> Unicode character is a historical artifact that started with the GPT-2 implementation. A very strong evidence for this claim is that the <code>GPT-4</code> tokenizer has ordinary spaces in its vocabulary. See <a href="#sec-next-steps" class="quarto-xref">Section&nbsp;5</a> for more.</p>
+</div>
+</div>
+<p>Next, let’s turn these tokens into ids:</p>
+<div id="cell-11" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>token_ids <span class="op">=</span> tokenizer.convert_tokens_to_ids(tokens)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>token_ids</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>[9906, 1917, 11, 584, 2351, 3974, 11410, 97, 245, 13]</code></pre>
+</div>
+</div>
+<p>As simple as that! We could now feed these <code>token_ids</code> into a language model, though it is important to note that in practice we would perform everything in one step:</p>
+<div id="cell-13" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a>inputs <span class="op">=</span> tokenizer(text, return_tensors<span class="op">=</span><span class="st">"pt"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2"></a>pprint(inputs, sort_dicts<span class="op">=</span><span class="va">False</span>)  <span class="co"># pprint stands for "pretty print"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'input_ids': tensor([[128000,   9906,   1917,     11,    584,   2351,   3974,  11410,     97,
+            245,     13]]),
+ 'attention_mask': tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])}</code></pre>
+</div>
+</div>
+<p>We would then call a Hugging Face-compatible model like so:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Define the model before this line</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>outputs <span class="op">=</span> model(<span class="op">**</span>inputs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For the sake of completeness, it is worth noting that one would only tokenize a single string on its own during inference. During training, one would either tokenize the whole dataset in batches before training or tokenize a batch of data on the fly. The former is usually more reliable and allows to restart training more easily if a crash occurs (see Thomas Wolf’s <a href="https://www.youtube.com/watch?v=2-SPH9hIKT8" target="_blank">video</a>).</p>
+</div>
+</div>
+</section>
+<section id="training-a-llama-3-tokenizer" class="level1">
+<h1>Training a Llama 3 tokenizer</h1>
+<p>This section discusses the code needed to train a new tokenizer from an old one using the <code>tokenizers</code> library. For now, we will assume that we already have a dataset to train on, and we will simply reuse the architecture of <code>Llama 3</code> tokenizer, so that we do not have to worry about the different tokenizer design choices.</p>
+<p>First, we define a function that takes a Hugging Face datasets and return a batched iterator over it:</p>
+<div id="cell-17" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Define an iterator over the training split of the dataset</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="kw">def</span> batch_iterator(dataset, batch_size<span class="op">=</span><span class="dv">1000</span>, verbose<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb12-3"><a href="#cb12-3"></a>    <span class="cf">if</span> verbose:</span>
+<span id="cb12-4"><a href="#cb12-4"></a>        <span class="bu">print</span>(<span class="ss">f"Dataset size: </span><span class="sc">{</span><span class="bu">len</span>(dataset)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-5"><a href="#cb12-5"></a></span>
+<span id="cb12-6"><a href="#cb12-6"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(dataset), batch_size):</span>
+<span id="cb12-7"><a href="#cb12-7"></a>        <span class="cf">yield</span> dataset[i:i<span class="op">+</span>batch_size][<span class="st">"text"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With that, we can go ahead and use it to train a new tokenizer:</p>
+<div id="cell-19" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a>new_tokenizer <span class="op">=</span> tokenizer.train_new_from_iterator(</span>
+<span id="cb13-2"><a href="#cb13-2"></a>    batch_iterator(dataset, verbose<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb13-3"><a href="#cb13-3"></a>    <span class="bu">len</span>(tokenizer.get_vocab()),</span>
+<span id="cb13-4"><a href="#cb13-4"></a>    initial_alphabet<span class="op">=</span>pre_tokenizers.ByteLevel.alphabet(),</span>
+<span id="cb13-5"><a href="#cb13-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-20" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a>new_tokenizer.add_tokens(<span class="bu">list</span>(tokenizer.get_added_vocab().keys()))</span>
+<span id="cb14-2"><a href="#cb14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="bu">print</span>(<span class="ss">f"Vocab length=</span><span class="sc">{</span><span class="bu">len</span>(new_tokenizer.get_vocab())<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4"></a></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="co"># Save the new tokenizer</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a>new_tokenizer.save_pretrained(<span class="st">"new-llama-tokenizer-english-only"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Vocab length=128256</code></pre>
+</div>
+</div>
+<p>This takes some time (about 1 minute on my machine), but the result is a working tokenizer, as easy as that!</p>
+<section id="assembling-a-llama-3-tokenizer-ourselves" class="level2">
+<h2 class="anchored" data-anchor-id="assembling-a-llama-3-tokenizer-ourselves">Assembling a Llama 3 tokenizer ourselves</h2>
+<p>Let’s now dive a bit deeper and see how we could construct the tokenizer ourselves. This is where the different design decisions come into play.</p>
+<p>Essentially, there are up to five components (most of them being optional) that have to be specified to have a working tokenizer. We will cover them briefly here, but I encourage reading <a href="https://huggingface.co/docs/tokenizers/en/components" target="_blank">this</a> great piece of documentation to learn more about the various components available in the <code>tokenizers</code> library that can be used to assemble a tokenizer.</p>
+<p>The 5 components are:</p>
+<ol type="1">
+<li><strong>Normalizer</strong> (optional): pre-process the input string for a given use case, e.g.&nbsp;strip accents (<code>é -&gt; e</code>) or make the strings lowercase.</li>
+<li><strong>Pre-tokenizer</strong> (optional): performs some initial splitting with the main intent being to prevent the existence of tokens that are too long, e.g.&nbsp;ones that connect multiple common words. We could avoid this by having a pre-tokenizer that splits across spaces.</li>
+<li><strong>Model</strong>: an algorithm that performs the tokenization (i.e.&nbsp;takes strings, splits them an converts into tokens).</li>
+<li><strong>Post-processor</strong> (optional): used for post-processing the tokenized string, e.g.&nbsp;we could add special tokens or apply some other template.</li>
+<li><strong>Decoder</strong> (optional): helps using the tokenizer in the opposite directiom. i.e.&nbsp;mapping a list of token ids into readable text. In the simplest case, just the model’s vocabulary is enough to perform the reversal, but certain normalizers or pre-tokenizers add special characters which are removed by the decoder.</li>
+</ol>
+<p>With this knowledge, we can now build our own <code>Llama 3</code> tokenizer! We can check <a href="https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct/blob/main/tokenizer.json" target="_blank">this</a> file to learn what the hyperparamaters are and just copy them over. It turns out that <code>Llama 3</code> does not use a normalizer (this is because normalization usually makes tokenization an irreversible process, e.g.&nbsp;if you remove accents, you cannot recover them during decoding), while the pre-tokenizer consists of a regex splitter and a byte-level pre-tokenizer. To understand the former, see <a href="https://www.youtube.com/watch?v=zduSFxRajkE" target="_blank">this</a> Andrej Karpathy’s video on tokenizers from <code>57:36</code> to <code>01:14:59</code>, while for the latter, BPE tokenizers are trained by starting with an initial vocabulary and then iteratively merging the most common byte pairs until the desired vocabulary size is reached. Back when <code>GPT-2</code> was created, instead of using the bytes corresponding to the first 256 Unicode characters, researchers decided to remap them to some other set of bytes. The reasons for this are not enrirely clear, but it is likely that using the set of the leading 256 bytes caused errors under their implementation.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This byte-level normalizer is actually the reason why the <code>Ġ</code> characters occur, since the space character <code>" "</code> is mapped to the <code>Ġ</code> character during normalization.</p>
+</div>
+</div>
+<p>Before jumping further into the model and decoder used by <code>Llama 3</code>, let’s quickly see these concepts in action.</p>
+<div id="cell-25" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="im">import</span> regex <span class="im">as</span> re</span>
+<span id="cb16-2"><a href="#cb16-2"></a>gpt_4_pat <span class="op">=</span> re.<span class="bu">compile</span>(<span class="vs">r"""'(?i:[sdmt]|ll|ve|re)|[^\r\n\p</span><span class="sc">{L}</span><span class="vs">\p</span><span class="sc">{N}</span><span class="vs">]?+\p</span><span class="sc">{L}</span><span class="vs">+|\p</span><span class="sc">{N}</span><span class="vs">{1,3}| ?[^\s\p</span><span class="sc">{L}</span><span class="vs">\p</span><span class="sc">{N}</span><span class="vs">]++[\r\n]*|\s*[\r\n]|\s+(?!\S)|\s+"""</span>)</span>
+<span id="cb16-3"><a href="#cb16-3"></a></span>
+<span id="cb16-4"><a href="#cb16-4"></a>some_text <span class="op">=</span> <span class="st">"Hello world, we're live 🤗. The number is 1234. How's it going!!!?"</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="bu">print</span>(re.findall(gpt_4_pat, some_text))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['Hello', ' world', ',', ' we', "'re", ' live', ' 🤗.', ' The', ' number', ' is', ' ', '123', '4', '.', ' How', "'s", ' it', ' going', '!!!?']</code></pre>
+</div>
+</div>
+<p>We can see that the regex splits by whitespace, numbers are no longer than 3 digits, and apostrophe abbreviations and punctuation are also separated out (the list is non-exhaustive). As the for <code>ByteLevel</code> pre-tokenizer, we can see that ordinary English characters remain unchanged, spaces are indeed replaced by the <code>Ġ</code> Unicode character, and the emoji is completely replace by a combination of multiple bytes:</p>
+<div id="cell-27" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a>pre_tokenizer <span class="op">=</span> pre_tokenizers.ByteLevel(</span>
+<span id="cb18-2"><a href="#cb18-2"></a>    add_prefix_space<span class="op">=</span><span class="va">False</span>, trim_offsets<span class="op">=</span><span class="va">True</span>, use_regex<span class="op">=</span><span class="va">False</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>)</span>
+<span id="cb18-4"><a href="#cb18-4"></a>pre_tokenization_result <span class="op">=</span> pre_tokenizer.pre_tokenize_str(some_text)[<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb18-5"><a href="#cb18-5"></a>pre_tokenization_result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>"HelloĠworld,Ġwe'reĠliveĠðŁ¤Ĺ.ĠTheĠnumberĠisĠ1234.ĠHow'sĠitĠgoing!!!?"</code></pre>
+</div>
+</div>
+<p>Returning to the components utilized by the Llama 3 tokenizer, the model employs the Byte Pair Encoding (BPE) algorithm. To avoid duplicating the excellent explanations already available, I encourage you to view the relevant sections of Andrej Karpathy’s video or consult the corresponding <a href="https://en.wikipedia.org/wiki/Byte_pair_encoding" target="_blank">Wikipedia entry</a>. The <code>ByteLevel</code> post-processor simply reverses the byte shifting that took place in the the pre-tokenization phase, as well as prepends the output string with the <code>&lt;|begin_of_text|&gt;</code> special token (this can be turned off by setting <code>add_special_tokens=False</code> when calling a tokenizer). Finally, the <code>ByteLevel</code> decoder is responsible for mapping token ids back to human-readable strings.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>How these design choices are made when building a <em>completely</em> new tokenizer from scratch is out of scope of this article, but it turns out that, in practice, it is enough to simply use a BPE model and only tune dataset used for training, the vocabulary size and the regular expression used to split strings during pre-tokenization.</p>
+</div>
+</div>
+<p><strong>Assembling our own <code>Llama 3</code> tokenizer</strong></p>
+<p>That was a lot to take in but we can finally assemble our own Llama 3 tokenizer:</p>
+<div id="cell-30" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Define the most important part - the model</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a>tokenizer_custom <span class="op">=</span> Tokenizer(models.BPE(ignore_merges<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb20-3"><a href="#cb20-3"></a></span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="co"># Add a pre-tokenizer</span></span>
+<span id="cb20-5"><a href="#cb20-5"></a>tokenizer_custom.pre_tokenizer <span class="op">=</span> pre_tokenizers.Sequence([</span>
+<span id="cb20-6"><a href="#cb20-6"></a>    pre_tokenizers.Split(</span>
+<span id="cb20-7"><a href="#cb20-7"></a>        pattern<span class="op">=</span>Regex(</span>
+<span id="cb20-8"><a href="#cb20-8"></a>            <span class="st">"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^</span><span class="ch">\\</span><span class="st">r</span><span class="ch">\\</span><span class="st">n</span><span class="ch">\\</span><span class="st">p</span><span class="sc">{L}</span><span class="ch">\\</span><span class="st">p</span><span class="sc">{N}</span><span class="st">]?</span><span class="ch">\\</span><span class="st">p</span><span class="sc">{L}</span><span class="st">+|</span><span class="ch">\\</span><span class="st">p</span><span class="sc">{N}</span><span class="st">{1,3}| ?[^</span><span class="ch">\\</span><span class="st">s</span><span class="ch">\\</span><span class="st">p</span><span class="sc">{L}</span><span class="ch">\\</span><span class="st">p</span><span class="sc">{N}</span><span class="st">]+[</span><span class="ch">\\</span><span class="st">r</span><span class="ch">\\</span><span class="st">n]*|</span><span class="ch">\\</span><span class="st">s*[</span><span class="ch">\\</span><span class="st">r</span><span class="ch">\\</span><span class="st">n]+|</span><span class="ch">\\</span><span class="st">s+(?!</span><span class="ch">\\</span><span class="st">S)|</span><span class="ch">\\</span><span class="st">s+"</span></span>
+<span id="cb20-9"><a href="#cb20-9"></a>        ),</span>
+<span id="cb20-10"><a href="#cb20-10"></a>        behavior<span class="op">=</span><span class="st">"isolated"</span>,</span>
+<span id="cb20-11"><a href="#cb20-11"></a>        invert<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb20-12"><a href="#cb20-12"></a>    ),</span>
+<span id="cb20-13"><a href="#cb20-13"></a>    pre_tokenizers.ByteLevel(</span>
+<span id="cb20-14"><a href="#cb20-14"></a>        add_prefix_space<span class="op">=</span><span class="va">False</span>, trim_offsets<span class="op">=</span><span class="va">True</span>, use_regex<span class="op">=</span><span class="va">False</span></span>
+<span id="cb20-15"><a href="#cb20-15"></a>    )</span>
+<span id="cb20-16"><a href="#cb20-16"></a>])</span>
+<span id="cb20-17"><a href="#cb20-17"></a></span>
+<span id="cb20-18"><a href="#cb20-18"></a><span class="co"># Add the post-processor</span></span>
+<span id="cb20-19"><a href="#cb20-19"></a>tokenizer_custom.post_processor <span class="op">=</span> processors.Sequence([</span>
+<span id="cb20-20"><a href="#cb20-20"></a>    processors.ByteLevel(</span>
+<span id="cb20-21"><a href="#cb20-21"></a>        add_prefix_space<span class="op">=</span><span class="va">True</span>, trim_offsets<span class="op">=</span><span class="va">False</span>, use_regex<span class="op">=</span><span class="va">True</span></span>
+<span id="cb20-22"><a href="#cb20-22"></a>    ),</span>
+<span id="cb20-23"><a href="#cb20-23"></a>    processors.TemplateProcessing(</span>
+<span id="cb20-24"><a href="#cb20-24"></a>        single<span class="op">=</span><span class="st">"&lt;|begin_of_text|&gt; $A"</span>,</span>
+<span id="cb20-25"><a href="#cb20-25"></a>        pair<span class="op">=</span><span class="st">"&lt;|begin_of_text|&gt; $A &lt;|begin_of_text|&gt;:1 $B:1"</span>,</span>
+<span id="cb20-26"><a href="#cb20-26"></a>        special_tokens<span class="op">=</span>[(<span class="st">"&lt;|begin_of_text|&gt;"</span>, <span class="dv">128000</span>)],</span>
+<span id="cb20-27"><a href="#cb20-27"></a>    ),</span>
+<span id="cb20-28"><a href="#cb20-28"></a>])</span>
+<span id="cb20-29"><a href="#cb20-29"></a></span>
+<span id="cb20-30"><a href="#cb20-30"></a><span class="co"># And finally, the decoder</span></span>
+<span id="cb20-31"><a href="#cb20-31"></a>tokenizer_custom.decoder <span class="op">=</span> decoders.ByteLevel()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s train and save it:</p>
+<div id="cell-32" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a><span class="im">from</span> tokenizers <span class="im">import</span> trainers</span>
+<span id="cb21-2"><a href="#cb21-2"></a></span>
+<span id="cb21-3"><a href="#cb21-3"></a>trainer <span class="op">=</span> trainers.BpeTrainer(</span>
+<span id="cb21-4"><a href="#cb21-4"></a>    <span class="co"># the `vocab_size` here actually means the number of merges</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a>    vocab_size<span class="op">=</span><span class="bu">len</span>(tokenizer.get_vocab()) <span class="op">-</span> <span class="bu">len</span>(pre_tokenizers.ByteLevel.alphabet()),</span>
+<span id="cb21-6"><a href="#cb21-6"></a>    initial_alphabet<span class="op">=</span>pre_tokenizers.ByteLevel.alphabet()</span>
+<span id="cb21-7"><a href="#cb21-7"></a>)</span>
+<span id="cb21-8"><a href="#cb21-8"></a></span>
+<span id="cb21-9"><a href="#cb21-9"></a>tokenizer_custom.train_from_iterator(</span>
+<span id="cb21-10"><a href="#cb21-10"></a>    batch_iterator(dataset, verbose<span class="op">=</span><span class="va">False</span>), trainer<span class="op">=</span>trainer</span>
+<span id="cb21-11"><a href="#cb21-11"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-33" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>tokenizer_custom.add_tokens(<span class="bu">list</span>(tokenizer.get_added_vocab().keys()))</span>
+<span id="cb22-2"><a href="#cb22-2"></a></span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="bu">print</span>(<span class="ss">f"Vocab length=</span><span class="sc">{</span><span class="bu">len</span>(tokenizer_custom.get_vocab())<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-4"><a href="#cb22-4"></a></span>
+<span id="cb22-5"><a href="#cb22-5"></a><span class="co"># Save the new tokenizer</span></span>
+<span id="cb22-6"><a href="#cb22-6"></a>tokenizer_custom.save(<span class="st">"new-llama-tokenizer-custom-english-only/tokenizer.json"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Vocab length=128256</code></pre>
+</div>
+</div>
+<p>We can check that the resulting tokenizer is indeed the same as the one that we have previously trained:</p>
+<div id="cell-35" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"new-llama-tokenizer-english-only/tokenizer.json"</span>, <span class="st">"r"</span>) <span class="im">as</span> f:</span>
+<span id="cb24-2"><a href="#cb24-2"></a>    new_tokenizer_config <span class="op">=</span> json.load(f)</span>
+<span id="cb24-3"><a href="#cb24-3"></a></span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"new-llama-tokenizer-custom-english-only/tokenizer.json"</span>, <span class="st">"r"</span>) <span class="im">as</span> f:</span>
+<span id="cb24-5"><a href="#cb24-5"></a>    custom_tokenizer_config <span class="op">=</span> json.load(f)</span>
+<span id="cb24-6"><a href="#cb24-6"></a></span>
+<span id="cb24-7"><a href="#cb24-7"></a>custom_tokenizer_config[<span class="st">"model"</span>][<span class="st">"merges"</span>] <span class="op">==</span> new_tokenizer_config[<span class="st">"model"</span>][<span class="st">"merges"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="85">
+<pre><code>True</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Upon inspecting the corresponding tokenizer configuration files (<a href="./new-llama-tokenizer-english-only/tokenizer.json" target="_blank">file 1</a> and <a href="./new-llama-tokenizer-custom-english-only/tokenizer.json" target="_blank">file 2</a>) you might notice that the two vocabularies are not exactly the same which is because a tokenizer trained from an old one has all the <em>added tokens</em> prepended at the start of the vocabulary. This is why above we check that the merges (i.e.&nbsp;which tokens where merged and in what sequence) are the same for the two tokenizers, which they are.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>And that is it, we have succesfully replicated the structure of the <code>Llama 3</code> tokenizer using the <code>tokenizers</code> library! As we can see, it is not that hard if we familiarize ourselves with the API of the <code>tokenizers</code> library and know where to find the configuration parameters.</p>
+</section>
+<section id="next-steps" class="level1">
+<h1>Next steps</h1>
+<p>There are many things that did not make it into this article which I briefly discuss here.</p>
+<ol type="1">
+<li><strong>How are the design choices actually made and implemented in practice?</strong> Above we just copied the configuration parameters, but how would we go about implementing a state-of-the-art tokenizer ourselves?
+<ul>
+<li>I enjoyed the <em>Getting the most out of your tokenizer for pre-training and domain adaptation</em> paper which discusses these topics (<a href="https://arxiv.org/abs/2402.01035" target="_blank">link</a>).</li>
+<li>My takeaways are that one should:
+<ol type="1">
+<li>Use BPE.</li>
+<li>Use a diverse training set that is large enough to cover different languages and code well.</li>
+<li>Choose vocabulary size to trade off text compression and memory overhead well (check the paper to understand what this means). A vocabulary size of 100k seems to be a good starting point, especially for smaller models.</li>
+</ol></li>
+</ul></li>
+<li><strong>The inner workings of the BPE algorithm itself, as well as how one would go about implementing it.</strong> For a proper deep dive, looking into the internals of the BPE algorithm and its implementation would seem like a must, but I think that there are already plenty great resources on the topic. Here are some of them that helped me build good intuitions for what is going on:
+<ul>
+<li>The aforementioned Karpathy’s video is a must-see for every LLM practitioner.</li>
+<li>The implementation of the <code>GPT-2</code> tokenizer (<a href="https://github.com/openai/gpt-2/blob/master/src/encoder.py">link</a>)</li>
+<li>The <a href="https://github.com/openai/tiktoken/blob/main/tiktoken/_educational.py" target="_blank">educational version</a> of the <code>tiktoken</code> library (note that it is meant to be easy to understand, but is not actually very efficient).</li>
+<li>[Much harder] <strong>The sources code of <a href="https://github.com/openai/tiktoken" target="_blank"><code>tiktoken</code></a> and <a href="https://github.com/huggingface/tokenizers" target="_blank"><code>tokenizers</code></a> libraries.</strong> Both of them are written in Rust 🥲.</li>
+</ul></li>
+<li><strong>Tokenizer parameters used during the inference stage.</strong> These mainly include <code>truncation</code> and <code>padding</code>, they are not inherently complex concepts, so I decided to exclude them here.
+<ul>
+<li>Consult the Hugging Face documentation and various blog posts to learn more about them.</li>
+</ul></li>
+</ol>
+<p>I strongly encourage you to check out these resources to get a better sense of what the BPE algorithm is doing and other aspects of tokenizers!</p>
+</section>
+<section id="sec-next-steps" class="level1">
+<h1>Open questions (for the curious reader)</h1>
+<p>I leave here some interesting questions and observations which arose to me while writing this article. I hope to come back to (at least some of) them at some point in the future, but if you end up going down the rabbit holes to find the answers, I would be curious to know them too! Here is the list:</p>
+<ol type="1">
+<li><strong>Replacing spaces with the <code>Ġ</code> Unicode character in BPE-based tokenizers is not necessary.</strong> The evidence for this is that the <code>GPT-4</code> tokenizer no longer uses them, so there is a high chance that it is just a historical artifact that people got used to since the release of <code>GPT-2</code> code and never questioned it afterwards.
+<ul>
+<li>Unless there is something that I am missing here, I believe that the community should ideally get rid of them over time.</li>
+</ul></li>
+<li>The <a href="https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct/raw/main/tokenizer.json" target="_blank"><code>Llama-3-8B-Instruct</code></a> and <a href="https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct/raw/main/tokenizer.json" target="_blank"><code>Llama-3-70B-Instruct</code></a> tokenizers are almost identical apart from one setting: the former has the <code>model.ignore_merges</code> key specified as <code>true</code>, while the latter does not have such a key specified. The question is simple, what difference does this make? A good starting point to answer this question could be <a href="https://github.com/huggingface/tokenizers/blob/71c2a8d01a56cd7bd28148c309e210c47dac78e7/tokenizers/src/models/bpe/model.rs#L466" target="_blank">this</a> piece of code.</li>
+<li>Running inference using the <code>tiktoken</code> library is <strong>much</strong> faster than with the <code>tokenizers</code> library.</li>
+<li>The first 100256 (256 initial + 100k merges) tokens of the <code>GPT-4</code> and <code>Llama 3</code> tokenizers are the same (see <a href="../../notes/llama-3-vs-gpt-4-tokenizer/llama-3-vs-gpt-4-tokenizer.html" target="_blank">this</a> note).
+<ul>
+<li>OpenAI never released their training code, so how could Meta know?</li>
+</ul></li>
+</ol>
+</section>
+<section id="sources" class="level1">
+<h1>Sources</h1>
+<ol type="1">
+<li>Let’s build the GPT Tokenizer (<a href="https://www.youtube.com/watch?v=zduSFxRajkE" target="_blank">video</a>) by Andrej Karpathy.</li>
+<li>A little guide to building Large Language Models in 2024 (<a href="https://www.youtube.com/watch?v=2-SPH9hIKT8" target="_blank">video</a>) by Thomas Wolf.</li>
+<li>Training a new tokenizer from an old one (<a href="https://huggingface.co/learn/nlp-course/en/chapter6/2" target="_blank">article</a>) on the Hugging Face course.</li>
+<li>Training from memory (part of <a href="https://huggingface.co/docs/tokenizers/en/training_from_memory" target="_blank">Hugging Face docs</a>).</li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+
+<div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
