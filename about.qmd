@@ -6,19 +6,19 @@ about:
   links:
     - icon: github
       text: Github
-      href: https://github.com/AugustasMacijauskas
+      href: https://github.com/augustasio
       target: _blank
     - icon: linkedin
       text: LinkedIn
       href: https://www.linkedin.com/in/augustas-macijauskas/
       target: _blank
-    - icon: twitter
+    - icon: twitter-x
       text: Twitter
-      href: https://twitter.com/augustasmac
+      href: https://twitter.com/augustasio
       target: _blank
     - icon: file-earmark-text-fill
       text: CV
-      href: personal-website/assets/Augustas_Macijauskas_CV.pdf
+      href: assets/Augustas_Macijauskas_CV.pdf
       target: _blank
 ---
 

@@ -1,1 +1,42 @@
-/* css styles */
+/* Move the dark/light theme toggle past the search icon to make it the
+   rightmost item. Quarto sets search to order:999, so we need higher. */
+.navbar .quarto-navbar-tools {
+  order: 1000 !important;
+  margin-left: 0.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.quarto-color-scheme-toggle,
+.quarto-color-scheme-toggle:hover {
+  display: flex !important;
+  align-items: center !important;
+  text-decoration: none !important;
+}
+
+/* Replace Quarto's default toggle-switch SVG icon with a moon icon
+   (shown in both light and dark modes), at a larger size. */
+.quarto-color-scheme-toggle .bi {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.quarto-color-scheme-toggle .bi::before {
+  background-image: none !important;
+  font-family: "bootstrap-icons" !important;
+  content: "\f494" !important; /* bi-moon-stars-fill */
+  width: auto !important;
+  height: auto !important;
+  font-size: 1.2rem !important;
+  line-height: 1;
+  vertical-align: middle;
+  transform: translateY(-1px);
+}
+
+/* Force the navbar to span the full viewport width — attempts to eliminate
+   the dark patch on the right (body bg showing where navbar doesn't extend). */
+nav.navbar {
+  width: 100vw !important;
+  max-width: 100vw !important;
+}

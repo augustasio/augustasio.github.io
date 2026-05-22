@@ -13,16 +13,16 @@ website:
       - text: "Notes"
         file: notes.qmd
       - icon: github
-        href: https://github.com/AugustasMacijauskas/
+        href: https://github.com/augustasio/
         target: _blank
       - icon: linkedin
         href: https://www.linkedin.com/in/augustas-macijauskas/
         target: _blank
-      - icon: twitter
-        href: https://twitter.com/augustasmac
+      - icon: twitter-x
+        href: https://twitter.com/augustasio
         target: _blank
   twitter-card:
-    creator: "@augustasmac"
+    creator: "@augustasio"
   open-graph:
     site-name: "Augustas Macijauskas's blog"
     # image: augustas-macijauskas-square-profile.jpg
@@ -34,10 +34,12 @@ website:
     type: implied
 format:
   html:
-    theme: cosmo
+    theme:
+      light: cosmo
+      dark: cyborg
     css: styles.css
     code-line-numbers: true
-    highlight-style: monokai
+    highlight-style: github
 
 comments:
   hypothesis:

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,8 +10,11 @@
 <meta name="dcterms.date" content="2024-09-09">
 <meta name="description" content="Solutions to a set of puzzles designed to teach GPU programming.">
 
-<title>Augustas Macijauskas - Solution to Sasha Rush’s GPU Puzzles</title>
+<title>Solution to Sasha Rush’s GPU Puzzles – Augustas Macijauskas</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -24,8 +27,9 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -70,15 +74,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../assets/favicon.ico" rel="icon">
 <script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
 <link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
-<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-09bcd2438ddda8166a810b4ec224e0a2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-e17ee4a53d7bad14356811d61d9bb51a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-09bcd2438ddda8166a810b4ec224e0a2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -147,18 +156,180 @@ cookieconsent.run({
 
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Augustas Macijauskas - Solution to Sasha Rush’s GPU Puzzles">
+<meta property="og:title" content="Solution to Sasha Rush’s GPU Puzzles – Augustas Macijauskas">
 <meta property="og:description" content="Solutions to a set of puzzles designed to teach GPU programming.">
 <meta property="og:image" content="cuda.png">
-<meta property="og:site_name" content="Augustas Macijauskas's blog">
-<meta name="twitter:title" content="Augustas Macijauskas - Solution to Sasha Rush’s GPU Puzzles">
+<meta property="og:site_name" content="Augustas Macijauskas">
+<meta name="twitter:title" content="Solution to Sasha Rush’s GPU Puzzles – Augustas Macijauskas">
 <meta name="twitter:description" content="Solutions to a set of puzzles designed to teach GPU programming.">
 <meta name="twitter:image" content="cuda.png">
-<meta name="twitter:creator" content="@augustasmac">
+<meta name="twitter:creator" content="@augustasio">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -170,7 +341,7 @@ cookieconsent.run({
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -184,7 +355,7 @@ cookieconsent.run({
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/AugustasMacijauskas/" target="_blank"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/augustasio/" target="_blank"> <i class="bi bi-github" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -194,13 +365,14 @@ cookieconsent.run({
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/augustasmac" target="_blank"> <i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/augustasio" target="_blank"> <i class="bi bi-twitter-x" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
     </nav>
@@ -275,6 +447,7 @@ cookieconsent.run({
 
 
 
+
 <p>These are my solutions to <a href="https://github.com/srush/GPU-Puzzles">GPU Puzzles</a> created by <a href="http://rush-nlp.com">Sasha Rush</a> - <a href="https://twitter.com/srush_nlp">srush_nlp</a></p>
 <hr>
 <p>GPU architectures are critical to machine learning, and seem to be becoming even more important every day. However, you can be an expert in machine learning without ever touching GPU code. It is hard to gain intuition working through abstractions.</p>
@@ -283,33 +456,33 @@ cookieconsent.run({
 <p>I recommend doing these in Colab, as it is easy to get started. Be sure to make your own copy, turn on GPU mode in the settings (<code>Runtime / Change runtime type</code>, then set <code>Hardware accelerator</code> to <code>GPU</code>), and then get to coding.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="https://colab.research.google.com/github/srush/GPU-Puzzles/blob/main/GPU_puzzlers.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img" alt="Open In Colab"></a></p>
+<p><a href="https://colab.research.google.com/github/srush/GPU-Puzzles/blob/main/GPU_puzzlers.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
 <figcaption>Open In Colab</figcaption>
 </figure>
 </div>
 <p>(If you are into this style of puzzle, also check out my <a href="https://github.com/srush/Tensor-Puzzles">Tensor Puzzles</a> for PyTorch.)</p>
-<div id="ca2fd9cd" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:13:29.965146Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:13:29.964772Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:01.898584Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:01.897122Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:13:29.965112Z&quot;}" data-outputid="27e65c84-6be7-4ce6-85d2-dcafd6c16f0a" data-trusted="true" data-execution_count="100">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">!</span>pip install <span class="op">-</span>qqq git<span class="op">+</span>https:<span class="op">//</span>github.com<span class="op">/</span>chalk<span class="op">-</span>diagrams<span class="op">/</span>planar git<span class="op">+</span>https:<span class="op">//</span>github.com<span class="op">/</span>danoneata<span class="op">/</span>chalk<span class="op">@</span>srush<span class="op">-</span>patch<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="op">!</span>wget <span class="op">-</span>q https:<span class="op">//</span>github.com<span class="op">/</span>srush<span class="op">/</span>GPU<span class="op">-</span>Puzzles<span class="op">/</span>raw<span class="op">/</span>main<span class="op">/</span>robot.png https:<span class="op">//</span>github.com<span class="op">/</span>srush<span class="op">/</span>GPU<span class="op">-</span>Puzzles<span class="op">/</span>raw<span class="op">/</span>main<span class="op">/</span>lib.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="ca2fd9cd" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:13:29.965146Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:13:29.964772Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:01.898584Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:01.897122Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:13:29.965112Z&quot;}}" data-outputid="27e65c84-6be7-4ce6-85d2-dcafd6c16f0a" data-trusted="true" data-execution_count="100">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">!</span>pip install <span class="op">-</span>qqq git<span class="op">+</span>https:<span class="op">//</span>github.com<span class="op">/</span>chalk<span class="op">-</span>diagrams<span class="op">/</span>planar git<span class="op">+</span>https:<span class="op">//</span>github.com<span class="op">/</span>danoneata<span class="op">/</span>chalk<span class="op">@</span>srush<span class="op">-</span>patch<span class="op">-</span><span class="dv">1</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="op">!</span>wget <span class="op">-</span>q https:<span class="op">//</span>github.com<span class="op">/</span>srush<span class="op">/</span>GPU<span class="op">-</span>Puzzles<span class="op">/</span>raw<span class="op">/</span>main<span class="op">/</span>robot.png https:<span class="op">//</span>github.com<span class="op">/</span>srush<span class="op">/</span>GPU<span class="op">-</span>Puzzles<span class="op">/</span>raw<span class="op">/</span>main<span class="op">/</span>lib.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="b6fbdb06" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:01.901478Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:01.901070Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:01.906878Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:01.905897Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:01.901440Z&quot;}" data-trusted="true" data-execution_count="101">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">import</span> numba</span>
+<div id="b6fbdb06" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:01.901478Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:01.901070Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:01.906878Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:01.905897Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:01.901440Z&quot;}}" data-trusted="true" data-execution_count="101">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">import</span> numba</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="im">import</span> warnings</span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="im">from</span> lib <span class="im">import</span> CudaProblem, Coord</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="im">from</span> lib <span class="im">import</span> CudaProblem, Coord</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="f8f4794a" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:01.908717Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:01.908266Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:01.951101Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:01.950033Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:01.908669Z&quot;}" data-trusted="true" data-execution_count="102">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>warnings.filterwarnings(</span>
+<div id="f8f4794a" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:01.908717Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:01.908266Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:01.951101Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:01.950033Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:01.908669Z&quot;}}" data-trusted="true" data-execution_count="102">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>warnings.filterwarnings(</span>
 <span id="cb3-2"><a href="#cb3-2"></a>    action<span class="op">=</span><span class="st">"ignore"</span>, category<span class="op">=</span>numba.NumbaPerformanceWarning, module<span class="op">=</span><span class="st">"numba"</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-3"><a href="#cb3-3"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="puzzle-1-map" class="level2">
 <h2 class="anchored" data-anchor-id="puzzle-1-map">Puzzle 1: Map</h2>
 <p>Implement a “kernel” (GPU function) that adds 10 to each position of vector <code>a</code> and stores it in vector <code>out</code>. You have 1 thread per position.</p>
 <p><strong>Warning</strong> This code looks like Python but it is really CUDA! You cannot use standard python tools like list comprehensions or ask for Numpy properties like shape or size (if you need the size, it is given as an argument). The puzzles only require doing simple operations, basically +, *, simple array indexing, for loops, and if statements. You are allowed to use local variables. If you get an error it is probably because you did something fancy :).</p>
 <p><em>Tip: Think of the function <code>call</code> as being run 1 time for each thread. The only difference is that <code>cuda.threadIdx.x</code> changes each time.</em></p>
-<div id="0157714d" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:01.953129Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:01.952670Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:02.070451Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:02.069393Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:01.953074Z&quot;}" data-outputid="5dadd98b-e00e-4d9f-e18e-473e2c9d0be9" data-trusted="true" data-execution_count="103">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">def</span> map_spec(a):</span>
+<div id="0157714d" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:01.953129Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:01.952670Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:02.070451Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:02.069393Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:01.953074Z&quot;}}" data-outputid="5dadd98b-e00e-4d9f-e18e-473e2c9d0be9" data-trusted="true" data-execution_count="103">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">def</span> map_spec(a):</span>
 <span id="cb4-2"><a href="#cb4-2"></a>    <span class="cf">return</span> a <span class="op">+</span> <span class="dv">10</span></span>
 <span id="cb4-3"><a href="#cb4-3"></a></span>
 <span id="cb4-4"><a href="#cb4-4"></a></span>
@@ -327,7 +500,7 @@ cookieconsent.run({
 <span id="cb4-16"><a href="#cb4-16"></a>problem <span class="op">=</span> CudaProblem(</span>
 <span id="cb4-17"><a href="#cb4-17"></a>    <span class="st">"Map"</span>, map_test, [a], out, threadsperblock<span class="op">=</span>Coord(SIZE, <span class="dv">1</span>), spec<span class="op">=</span>map_spec</span>
 <span id="cb4-18"><a href="#cb4-18"></a>)</span>
-<span id="cb4-19"><a href="#cb4-19"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-19"><a href="#cb4-19"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Map
  
@@ -344,11 +517,11 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="a7f022d1" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:02.074391Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:02.073927Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:02.151310Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:02.150300Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:02.074342Z&quot;}" data-lines_to_end_of_cell_marker="0" data-outputid="29b8c143-1238-452f-8114-6e78aacb071a" data-trusted="true" data-execution_count="104">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># My comment: here and below we use a semicolon to prevent a dog video from</span></span>
+<div id="a7f022d1" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:02.074391Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:02.073927Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:02.151310Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:02.150300Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:02.074342Z&quot;}}" data-lines_to_end_of_cell_marker="0" data-outputid="29b8c143-1238-452f-8114-6e78aacb071a" data-trusted="true" data-execution_count="104">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># My comment: here and below we use a semicolon to prevent a dog video from</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="co"># being rendered. It's a fun addition by the original author, but I foun it too</span></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co"># distracting for my liking</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-4"><a href="#cb6-4"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -357,8 +530,8 @@ cookieconsent.run({
 <section id="puzzle-2---zip" class="level2">
 <h2 class="anchored" data-anchor-id="puzzle-2---zip">Puzzle 2 - Zip</h2>
 <p>Implement a kernel that adds together each position of <code>a</code> and <code>b</code> and stores it in <code>out</code>. You have 1 thread per position.</p>
-<div id="09416170" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:02.153090Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:02.152663Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.559346Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.558242Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:02.153048Z&quot;}" data-outputid="139f9beb-333e-429a-a215-734ad1ca3279" data-trusted="true" data-execution_count="105">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">def</span> zip_spec(a, b):</span>
+<div id="09416170" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:02.153090Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:02.152663Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.559346Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.558242Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:02.153048Z&quot;}}" data-outputid="139f9beb-333e-429a-a215-734ad1ca3279" data-trusted="true" data-execution_count="105">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">def</span> zip_spec(a, b):</span>
 <span id="cb8-2"><a href="#cb8-2"></a>    <span class="cf">return</span> a <span class="op">+</span> b</span>
 <span id="cb8-3"><a href="#cb8-3"></a></span>
 <span id="cb8-4"><a href="#cb8-4"></a></span>
@@ -377,7 +550,7 @@ cookieconsent.run({
 <span id="cb8-17"><a href="#cb8-17"></a>problem <span class="op">=</span> CudaProblem(</span>
 <span id="cb8-18"><a href="#cb8-18"></a>    <span class="st">"Zip"</span>, zip_test, [a, b], out, threadsperblock<span class="op">=</span>Coord(SIZE, <span class="dv">1</span>), spec<span class="op">=</span>zip_spec</span>
 <span id="cb8-19"><a href="#cb8-19"></a>)</span>
-<span id="cb8-20"><a href="#cb8-20"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-20"><a href="#cb8-20"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Zip
  
@@ -394,8 +567,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="fd37ad5f" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.561770Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.560971Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.630353Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.629324Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.561707Z&quot;}" data-lines_to_end_of_cell_marker="0" data-outputid="4c9e0dfd-9d42-47d7-8850-318135fa97aa" data-trusted="true" data-execution_count="106">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="fd37ad5f" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.561770Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.560971Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.630353Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.629324Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.561707Z&quot;}}" data-lines_to_end_of_cell_marker="0" data-outputid="4c9e0dfd-9d42-47d7-8850-318135fa97aa" data-trusted="true" data-execution_count="106">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -404,8 +577,8 @@ cookieconsent.run({
 <section id="puzzle-3---guards" class="level2">
 <h2 class="anchored" data-anchor-id="puzzle-3---guards">Puzzle 3 - Guards</h2>
 <p>Implement a kernel that adds 10 to each position of <code>a</code> and stores it in <code>out</code>. You have more threads than positions.</p>
-<div id="1508af70" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.632485Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.632138Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.762330Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.761396Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.632450Z&quot;}" data-outputid="dd354e6c-e1dc-4a35-8214-8c568d9b653e" data-trusted="true" data-execution_count="107">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">def</span> map_guard_test(cuda):</span>
+<div id="1508af70" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.632485Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.632138Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.762330Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.761396Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.632450Z&quot;}}" data-outputid="dd354e6c-e1dc-4a35-8214-8c568d9b653e" data-trusted="true" data-execution_count="107">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">def</span> map_guard_test(cuda):</span>
 <span id="cb12-2"><a href="#cb12-2"></a>    <span class="kw">def</span> call(out, a, size) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
 <span id="cb12-3"><a href="#cb12-3"></a>        local_i <span class="op">=</span> cuda.threadIdx.x</span>
 <span id="cb12-4"><a href="#cb12-4"></a>        <span class="cf">if</span> local_i <span class="op">&lt;</span> size:</span>
@@ -438,7 +611,7 @@ cookieconsent.run({
 <span id="cb12-31"><a href="#cb12-31"></a>    threadsperblock<span class="op">=</span>Coord(<span class="dv">8</span>, <span class="dv">1</span>),</span>
 <span id="cb12-32"><a href="#cb12-32"></a>    spec<span class="op">=</span>map_spec,</span>
 <span id="cb12-33"><a href="#cb12-33"></a>)</span>
-<span id="cb12-34"><a href="#cb12-34"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-34"><a href="#cb12-34"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Guard
  
@@ -455,8 +628,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="53465ec8" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.764212Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.763836Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.837551Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.836637Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.764151Z&quot;}" data-lines_to_end_of_cell_marker="0" data-outputid="21f50ccd-216b-4a9d-fa5b-2908fad1fadb" data-trusted="true" data-execution_count="108">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="53465ec8" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.764212Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.763836Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.837551Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.836637Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.764151Z&quot;}}" data-lines_to_end_of_cell_marker="0" data-outputid="21f50ccd-216b-4a9d-fa5b-2908fad1fadb" data-trusted="true" data-execution_count="108">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -465,8 +638,8 @@ cookieconsent.run({
 <section id="puzzle-4---map-2d" class="level2">
 <h2 class="anchored" data-anchor-id="puzzle-4---map-2d">Puzzle 4 - Map 2D</h2>
 <p>Implement a kernel that adds 10 to each position of <code>a</code> and stores it in <code>out</code>. Input <code>a</code> is 2D and square. You have more threads than positions.</p>
-<div id="761c4554" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.839525Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.839100Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.986364Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.985394Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.839478Z&quot;}" data-outputid="5791600e-364e-4c75-af94-b3de71f61722" data-trusted="true" data-execution_count="109">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">def</span> map_2D_test(cuda):</span>
+<div id="761c4554" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.839525Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.839100Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:03.986364Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:03.985394Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.839478Z&quot;}}" data-outputid="5791600e-364e-4c75-af94-b3de71f61722" data-trusted="true" data-execution_count="109">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">def</span> map_2D_test(cuda):</span>
 <span id="cb16-2"><a href="#cb16-2"></a>    <span class="kw">def</span> call(out, a, size) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
 <span id="cb16-3"><a href="#cb16-3"></a>        local_i <span class="op">=</span> cuda.threadIdx.x</span>
 <span id="cb16-4"><a href="#cb16-4"></a>        local_j <span class="op">=</span> cuda.threadIdx.y</span>
@@ -502,7 +675,7 @@ cookieconsent.run({
 <span id="cb16-34"><a href="#cb16-34"></a>    threadsperblock<span class="op">=</span>Coord(<span class="dv">3</span>, <span class="dv">3</span>),</span>
 <span id="cb16-35"><a href="#cb16-35"></a>    spec<span class="op">=</span>map_spec,</span>
 <span id="cb16-36"><a href="#cb16-36"></a>)</span>
-<span id="cb16-37"><a href="#cb16-37"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-37"><a href="#cb16-37"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Map 2D
  
@@ -519,8 +692,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="b7819b8a" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.987976Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.987665Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.077587Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.076597Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.987944Z&quot;}" data-lines_to_end_of_cell_marker="0" data-outputid="67be25a9-938f-4a4a-ddf1-5bc4f9ddbf14" data-trusted="true" data-execution_count="110">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b7819b8a" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:03.987976Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:03.987665Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.077587Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.076597Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:03.987944Z&quot;}}" data-lines_to_end_of_cell_marker="0" data-outputid="67be25a9-938f-4a4a-ddf1-5bc4f9ddbf14" data-trusted="true" data-execution_count="110">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -529,8 +702,8 @@ cookieconsent.run({
 <section id="puzzle-5---broadcast" class="level2">
 <h2 class="anchored" data-anchor-id="puzzle-5---broadcast">Puzzle 5 - Broadcast</h2>
 <p>Implement a kernel that adds <code>a</code> and <code>b</code> and stores it in <code>out</code>. Inputs <code>a</code> and <code>b</code> are vectors. You have more threads than positions.</p>
-<div id="c9203c98" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.078978Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.078676Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.259153Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.258216Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.078946Z&quot;}" data-outputid="99f32fbf-ba91-4703-925e-03ea120dab16" data-trusted="true" data-execution_count="111">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">def</span> broadcast_test(cuda):</span>
+<div id="c9203c98" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.078978Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.078676Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.259153Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.258216Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.078946Z&quot;}}" data-outputid="99f32fbf-ba91-4703-925e-03ea120dab16" data-trusted="true" data-execution_count="111">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">def</span> broadcast_test(cuda):</span>
 <span id="cb20-2"><a href="#cb20-2"></a>    <span class="kw">def</span> call(out, a, b, size) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
 <span id="cb20-3"><a href="#cb20-3"></a>        local_i <span class="op">=</span> cuda.threadIdx.x</span>
 <span id="cb20-4"><a href="#cb20-4"></a>        local_j <span class="op">=</span> cuda.threadIdx.y</span>
@@ -553,7 +726,7 @@ cookieconsent.run({
 <span id="cb20-21"><a href="#cb20-21"></a>    threadsperblock<span class="op">=</span>Coord(<span class="dv">3</span>, <span class="dv">3</span>),</span>
 <span id="cb20-22"><a href="#cb20-22"></a>    spec<span class="op">=</span>zip_spec,</span>
 <span id="cb20-23"><a href="#cb20-23"></a>)</span>
-<span id="cb20-24"><a href="#cb20-24"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-24"><a href="#cb20-24"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Broadcast
  
@@ -570,8 +743,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="8f87cc45" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.260890Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.260572Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.358576Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.357647Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.260858Z&quot;}" data-lines_to_end_of_cell_marker="0" data-outputid="241bbfca-81a6-49fe-c66e-acbf3b62ee4b" data-trusted="true" data-execution_count="112">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8f87cc45" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.260890Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.260572Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.358576Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.357647Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.260858Z&quot;}}" data-lines_to_end_of_cell_marker="0" data-outputid="241bbfca-81a6-49fe-c66e-acbf3b62ee4b" data-trusted="true" data-execution_count="112">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -581,8 +754,8 @@ cookieconsent.run({
 <h2 class="anchored" data-anchor-id="puzzle-6---blocks">Puzzle 6 - Blocks</h2>
 <p>Implement a kernel that adds 10 to each position of <code>a</code> and stores it in <code>out</code>. You have fewer threads per block than the size of <code>a</code>.</p>
 <p><em>Tip: A block is a group of threads. The number of threads per block is limited, but we can have many different blocks. Variable <code>cuda.blockIdx</code> tells us what block we are in.</em></p>
-<div id="66d02f83" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.363699Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.363360Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.661365Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.660429Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.363664Z&quot;}" data-outputid="de4f2a51-175f-4e9b-ccc9-5049a3aacf21" data-trusted="true" data-execution_count="113">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw">def</span> map_block_test(cuda):</span>
+<div id="66d02f83" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.363699Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.363360Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.661365Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.660429Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.363664Z&quot;}}" data-outputid="de4f2a51-175f-4e9b-ccc9-5049a3aacf21" data-trusted="true" data-execution_count="113">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw">def</span> map_block_test(cuda):</span>
 <span id="cb24-2"><a href="#cb24-2"></a>    <span class="kw">def</span> call(out, a, size) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
 <span id="cb24-3"><a href="#cb24-3"></a>        i <span class="op">=</span> cuda.blockIdx.x <span class="op">*</span> cuda.blockDim.x <span class="op">+</span> cuda.threadIdx.x</span>
 <span id="cb24-4"><a href="#cb24-4"></a>        </span>
@@ -605,7 +778,7 @@ cookieconsent.run({
 <span id="cb24-21"><a href="#cb24-21"></a>    blockspergrid<span class="op">=</span>Coord(<span class="dv">3</span>, <span class="dv">1</span>),</span>
 <span id="cb24-22"><a href="#cb24-22"></a>    spec<span class="op">=</span>map_spec,</span>
 <span id="cb24-23"><a href="#cb24-23"></a>)</span>
-<span id="cb24-24"><a href="#cb24-24"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-24"><a href="#cb24-24"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Blocks
  
@@ -622,8 +795,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="dfe4376d" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.662837Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.662532Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.741504Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.740469Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.662804Z&quot;}" data-lines_to_end_of_cell_marker="0" data-outputid="95ddd426-21dc-4750-9485-030dd38c8d82" data-trusted="true" data-execution_count="114">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="dfe4376d" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.662837Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.662532Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:04.741504Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:04.740469Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.662804Z&quot;}}" data-lines_to_end_of_cell_marker="0" data-outputid="95ddd426-21dc-4750-9485-030dd38c8d82" data-trusted="true" data-execution_count="114">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -632,8 +805,8 @@ cookieconsent.run({
 <section id="puzzle-7---blocks-2d" class="level2">
 <h2 class="anchored" data-anchor-id="puzzle-7---blocks-2d">Puzzle 7 - Blocks 2D</h2>
 <p>Implement the same kernel in 2D. You have fewer threads per block than the size of <code>a</code> in both directions.</p>
-<div id="58315dbc" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.743006Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.742679Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:05.556616Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:05.555677Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.742971Z&quot;}" data-outputid="7a0e02de-ed58-46ac-a55e-7106c5f491c6" data-trusted="true" data-execution_count="115">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">def</span> map_block2D_test(cuda):</span>
+<div id="58315dbc" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:04.743006Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:04.742679Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:05.556616Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:05.555677Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:04.742971Z&quot;}}" data-outputid="7a0e02de-ed58-46ac-a55e-7106c5f491c6" data-trusted="true" data-execution_count="115">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">def</span> map_block2D_test(cuda):</span>
 <span id="cb28-2"><a href="#cb28-2"></a>    <span class="kw">def</span> call(out, a, size) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
 <span id="cb28-3"><a href="#cb28-3"></a>        i <span class="op">=</span> cuda.blockIdx.x <span class="op">*</span> cuda.blockDim.x <span class="op">+</span> cuda.threadIdx.x</span>
 <span id="cb28-4"><a href="#cb28-4"></a>        j <span class="op">=</span> cuda.blockIdx.y <span class="op">*</span> cuda.blockDim.y <span class="op">+</span> cuda.threadIdx.y</span>
@@ -658,7 +831,7 @@ cookieconsent.run({
 <span id="cb28-23"><a href="#cb28-23"></a>    blockspergrid<span class="op">=</span>Coord(<span class="dv">2</span>, <span class="dv">2</span>),</span>
 <span id="cb28-24"><a href="#cb28-24"></a>    spec<span class="op">=</span>map_spec,</span>
 <span id="cb28-25"><a href="#cb28-25"></a>)</span>
-<span id="cb28-26"><a href="#cb28-26"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-26"><a href="#cb28-26"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Blocks 2D
  
@@ -675,8 +848,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="d27db3cb" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:05.558123Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:05.557807Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:05.658156Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:05.657228Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:05.558091Z&quot;}" data-outputid="1a6f7434-2fd6-4136-e3d6-0f5bec56a6d8" data-trusted="true" data-execution_count="116">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d27db3cb" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:05.558123Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:05.557807Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:05.658156Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:05.657228Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:05.558091Z&quot;}}" data-outputid="1a6f7434-2fd6-4136-e3d6-0f5bec56a6d8" data-trusted="true" data-execution_count="116">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -687,8 +860,8 @@ cookieconsent.run({
 <p>Implement a kernel that adds 10 to each position of <code>a</code> and stores it in <code>out</code>. You have fewer threads per block than the size of <code>a</code>.</p>
 <p><strong>Warning</strong>: Each block can only have a <em>constant</em> amount of shared memory that threads in that block can read and write to. This needs to be a literal python constant not a variable. After writing to shared memory you need to call <code>cuda.syncthreads</code> to ensure that threads do not cross.</p>
 <p>(This example does not really need shared memory or syncthreads, but it is a demo.)</p>
-<div id="e7408567" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:05.660440Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:05.659436Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:06.021836Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:06.020923Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:05.660404Z&quot;}" data-outputid="2619127e-1b02-4766-92ec-0c2f308d6eb4" data-trusted="true" data-execution_count="117">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a>TPB <span class="op">=</span> <span class="dv">4</span></span>
+<div id="e7408567" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:05.660440Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:05.659436Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:06.021836Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:06.020923Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:05.660404Z&quot;}}" data-outputid="2619127e-1b02-4766-92ec-0c2f308d6eb4" data-trusted="true" data-execution_count="117">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a>TPB <span class="op">=</span> <span class="dv">4</span></span>
 <span id="cb32-2"><a href="#cb32-2"></a><span class="kw">def</span> shared_test(cuda):</span>
 <span id="cb32-3"><a href="#cb32-3"></a>    <span class="kw">def</span> call(out, a, size) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
 <span id="cb32-4"><a href="#cb32-4"></a>        shared <span class="op">=</span> cuda.shared.array(TPB, numba.float32)</span>
@@ -716,7 +889,7 @@ cookieconsent.run({
 <span id="cb32-26"><a href="#cb32-26"></a>    blockspergrid<span class="op">=</span>Coord(<span class="dv">2</span>, <span class="dv">1</span>),</span>
 <span id="cb32-27"><a href="#cb32-27"></a>    spec<span class="op">=</span>map_spec,</span>
 <span id="cb32-28"><a href="#cb32-28"></a>)</span>
-<span id="cb32-29"><a href="#cb32-29"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-29"><a href="#cb32-29"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Shared
  
@@ -733,8 +906,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="2eb679fd" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:06.023270Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:06.022960Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:06.122629Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:06.121627Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:06.023239Z&quot;}" data-lines_to_end_of_cell_marker="0" data-outputid="ae407128-5cb4-45dc-bfda-72d6218958ba" data-trusted="true" data-execution_count="118">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2eb679fd" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:06.023270Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:06.022960Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:06.122629Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:06.121627Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:06.023239Z&quot;}}" data-lines_to_end_of_cell_marker="0" data-outputid="ae407128-5cb4-45dc-bfda-72d6218958ba" data-trusted="true" data-execution_count="118">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -744,8 +917,8 @@ cookieconsent.run({
 <h2 class="anchored" data-anchor-id="puzzle-9---pooling">Puzzle 9 - Pooling</h2>
 <p>Implement a kernel that sums together the last 3 position of <code>a</code> and stores it in <code>out</code>. You have 1 thread per position. You only need 1 global read and 1 global write per thread.</p>
 <p><em>Tip: Remember to be careful about syncing.</em></p>
-<div id="17e25964" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:06.124115Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:06.123803Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:06.518642Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:06.517697Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:06.124073Z&quot;}" data-outputid="ff3144d8-6d38-4991-ad22-7b84c7122b79" data-trusted="true" data-execution_count="119">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a><span class="kw">def</span> pool_spec(a):</span>
+<div id="17e25964" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:06.124115Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:06.123803Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:06.518642Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:06.517697Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:06.124073Z&quot;}}" data-outputid="ff3144d8-6d38-4991-ad22-7b84c7122b79" data-trusted="true" data-execution_count="119">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a><span class="kw">def</span> pool_spec(a):</span>
 <span id="cb36-2"><a href="#cb36-2"></a>    out <span class="op">=</span> np.zeros(<span class="op">*</span>a.shape)</span>
 <span id="cb36-3"><a href="#cb36-3"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(a.shape[<span class="dv">0</span>]):</span>
 <span id="cb36-4"><a href="#cb36-4"></a>        out[i] <span class="op">=</span> a[<span class="bu">max</span>(i <span class="op">-</span> <span class="dv">2</span>, <span class="dv">0</span>) : i <span class="op">+</span> <span class="dv">1</span>].<span class="bu">sum</span>()</span>
@@ -791,7 +964,7 @@ cookieconsent.run({
 <span id="cb36-44"><a href="#cb36-44"></a>    blockspergrid<span class="op">=</span>Coord(<span class="dv">1</span>, <span class="dv">1</span>),</span>
 <span id="cb36-45"><a href="#cb36-45"></a>    spec<span class="op">=</span>pool_spec,</span>
 <span id="cb36-46"><a href="#cb36-46"></a>)</span>
-<span id="cb36-47"><a href="#cb36-47"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb36-47"><a href="#cb36-47"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Pooling
  
@@ -808,8 +981,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="a7b6ebaa" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:06.520195Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:06.519856Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:06.669891Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:06.668945Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:06.520150Z&quot;}" data-lines_to_end_of_cell_marker="0" data-outputid="da07525b-493c-49ab-b213-b8e3dbc97c70" data-trusted="true" data-execution_count="120">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="a7b6ebaa" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:06.520195Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:06.519856Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:06.669891Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:06.668945Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:06.520150Z&quot;}}" data-lines_to_end_of_cell_marker="0" data-outputid="da07525b-493c-49ab-b213-b8e3dbc97c70" data-trusted="true" data-execution_count="120">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -819,8 +992,8 @@ cookieconsent.run({
 <h2 class="anchored" data-anchor-id="puzzle-10---dot-product">Puzzle 10 - Dot Product</h2>
 <p>Implement a kernel that computes the dot-product of <code>a</code> and <code>b</code> and stores it in <code>out</code>. You have 1 thread per position. You only need 2 global reads and 1 global write per thread.</p>
 <p><em>Note: For this problem you don’t need to worry about number of shared reads. We will handle that challenge later.</em></p>
-<div id="20021149" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:06.671488Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:06.671159Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:07.044012Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:07.043108Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:06.671455Z&quot;}" data-outputid="d7f5b0a4-259a-4376-b3f3-fbb99974b50d" data-trusted="true" data-execution_count="121">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a><span class="kw">def</span> dot_spec(a, b):</span>
+<div id="20021149" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:06.671488Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:06.671159Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:07.044012Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:07.043108Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:06.671455Z&quot;}}" data-outputid="d7f5b0a4-259a-4376-b3f3-fbb99974b50d" data-trusted="true" data-execution_count="121">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a><span class="kw">def</span> dot_spec(a, b):</span>
 <span id="cb40-2"><a href="#cb40-2"></a>    <span class="cf">return</span> a <span class="op">@</span> b</span>
 <span id="cb40-3"><a href="#cb40-3"></a></span>
 <span id="cb40-4"><a href="#cb40-4"></a>TPB <span class="op">=</span> <span class="dv">8</span></span>
@@ -862,7 +1035,7 @@ cookieconsent.run({
 <span id="cb40-40"><a href="#cb40-40"></a>    blockspergrid<span class="op">=</span>Coord(<span class="dv">1</span>, <span class="dv">1</span>),</span>
 <span id="cb40-41"><a href="#cb40-41"></a>    spec<span class="op">=</span>dot_spec,</span>
 <span id="cb40-42"><a href="#cb40-42"></a>)</span>
-<span id="cb40-43"><a href="#cb40-43"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb40-43"><a href="#cb40-43"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># Dot
  
@@ -879,8 +1052,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="e1304f3a" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:07.045704Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:07.045391Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:07.196796Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:07.195837Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:07.045672Z&quot;}" data-outputid="4f827a54-97cc-4844-f4f9-8fe91b63e7fa" data-trusted="true" data-execution_count="122">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a>problem.check()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e1304f3a" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:07.045704Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:07.045391Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:07.196796Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:07.195837Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:07.045672Z&quot;}}" data-outputid="4f827a54-97cc-4844-f4f9-8fe91b63e7fa" data-trusted="true" data-execution_count="122">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a>problem.check()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!</code></pre>
 </div>
@@ -889,8 +1062,8 @@ cookieconsent.run({
 <section id="puzzle-11---1d-convolution" class="level2">
 <h2 class="anchored" data-anchor-id="puzzle-11---1d-convolution">Puzzle 11 - 1D Convolution</h2>
 <p>Implement a kernel that computes a 1D convolution between <code>a</code> and <code>b</code> and stores it in <code>out</code>. You need to handle the general case. You only need 2 global reads and 1 global write per thread.</p>
-<div id="128a4418" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:07.198768Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:07.198365Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:07.969408Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:07.968399Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:07.198720Z&quot;}" data-outputid="d55ff745-47f5-493a-efd3-d0e761f133d0" data-trusted="true" data-execution_count="123">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a><span class="kw">def</span> conv_spec(a, b):</span>
+<div id="128a4418" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:07.198768Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:07.198365Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:07.969408Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:07.968399Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:07.198720Z&quot;}}" data-outputid="d55ff745-47f5-493a-efd3-d0e761f133d0" data-trusted="true" data-execution_count="123">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a><span class="kw">def</span> conv_spec(a, b):</span>
 <span id="cb44-2"><a href="#cb44-2"></a>    out <span class="op">=</span> np.zeros(<span class="op">*</span>a.shape)</span>
 <span id="cb44-3"><a href="#cb44-3"></a>    <span class="bu">len</span> <span class="op">=</span> b.shape[<span class="dv">0</span>]</span>
 <span id="cb44-4"><a href="#cb44-4"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(a.shape[<span class="dv">0</span>]):</span>
@@ -989,7 +1162,7 @@ cookieconsent.run({
 <span id="cb44-97"><a href="#cb44-97"></a>    spec<span class="op">=</span>conv_spec,</span>
 <span id="cb44-98"><a href="#cb44-98"></a>)</span>
 <span id="cb44-99"><a href="#cb44-99"></a>problem.check()</span>
-<span id="cb44-100"><a href="#cb44-100"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb44-100"><a href="#cb44-100"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # 1D Conv (Simple)
@@ -1007,8 +1180,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="2a6eb34b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:07.971469Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:07.970872Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:09.772028Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:09.771150Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:07.971425Z&quot;}" data-outputid="c961a509-8b43-4448-e4db-738062583247" data-trusted="true" data-execution_count="124">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a>out <span class="op">=</span> np.zeros(<span class="dv">15</span>)</span>
+<div id="2a6eb34b" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:07.971469Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:07.970872Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:09.772028Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:09.771150Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:07.971425Z&quot;}}" data-outputid="c961a509-8b43-4448-e4db-738062583247" data-trusted="true" data-execution_count="124">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a>out <span class="op">=</span> np.zeros(<span class="dv">15</span>)</span>
 <span id="cb46-2"><a href="#cb46-2"></a>a <span class="op">=</span> np.arange(<span class="dv">15</span>)</span>
 <span id="cb46-3"><a href="#cb46-3"></a>b <span class="op">=</span> np.arange(<span class="dv">4</span>)</span>
 <span id="cb46-4"><a href="#cb46-4"></a>problem <span class="op">=</span> CudaProblem(</span>
@@ -1022,7 +1195,7 @@ cookieconsent.run({
 <span id="cb46-12"><a href="#cb46-12"></a>    spec<span class="op">=</span>conv_spec,</span>
 <span id="cb46-13"><a href="#cb46-13"></a>)</span>
 <span id="cb46-14"><a href="#cb46-14"></a>problem.check()</span>
-<span id="cb46-15"><a href="#cb46-15"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb46-15"><a href="#cb46-15"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # 1D Conv (Full)
@@ -1040,8 +1213,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="6c3ae4dd" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:09.773611Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:09.773308Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:12.332368Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:12.331428Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:09.773580Z&quot;}" data-trusted="true" data-execution_count="125">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># My comment: let's create an additional text to check that it works for too</span></span>
+<div id="6c3ae4dd" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:09.773611Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:09.773308Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:12.332368Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:12.331428Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:09.773580Z&quot;}}" data-trusted="true" data-execution_count="125">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># My comment: let's create an additional text to check that it works for too</span></span>
 <span id="cb48-2"><a href="#cb48-2"></a>out <span class="op">=</span> np.zeros(<span class="dv">21</span>)</span>
 <span id="cb48-3"><a href="#cb48-3"></a>a <span class="op">=</span> np.arange(<span class="dv">21</span>)</span>
 <span id="cb48-4"><a href="#cb48-4"></a>b <span class="op">=</span> np.arange(<span class="dv">4</span>)</span>
@@ -1056,7 +1229,7 @@ cookieconsent.run({
 <span id="cb48-13"><a href="#cb48-13"></a>    spec<span class="op">=</span>conv_spec,</span>
 <span id="cb48-14"><a href="#cb48-14"></a>)</span>
 <span id="cb48-15"><a href="#cb48-15"></a>problem.check()</span>
-<span id="cb48-16"><a href="#cb48-16"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb48-16"><a href="#cb48-16"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # 1D Conv (Full)
@@ -1080,8 +1253,8 @@ cookieconsent.run({
 <p>Implement a kernel that computes a sum over <code>a</code> and stores it in <code>out</code>. If the size of <code>a</code> is greater than the block size, only store the sum of each block.</p>
 <p>We will do this using the <a href="https://en.wikipedia.org/wiki/Prefix_sum">parallel prefix sum</a> algorithm in shared memory. That is, each step of the algorithm should sum together half the remaining numbers. Follow this diagram:</p>
 <p><img src="https://user-images.githubusercontent.com/35882/178757889-1c269623-93af-4a2e-a7e9-22cd55a42e38.png" class="img-fluid"></p>
-<div id="a0d0bd6e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:12.334489Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:12.334099Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:12.949902Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:12.949002Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:12.334449Z&quot;}" data-trusted="true" data-execution_count="126">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a><span class="kw">def</span> sum_spec(a):</span>
+<div id="a0d0bd6e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:12.334489Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:12.334099Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:12.949902Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:12.949002Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:12.334449Z&quot;}}" data-trusted="true" data-execution_count="126">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a><span class="kw">def</span> sum_spec(a):</span>
 <span id="cb50-2"><a href="#cb50-2"></a>    out <span class="op">=</span> np.zeros((a.shape[<span class="dv">0</span>] <span class="op">+</span> TPB <span class="op">-</span> <span class="dv">1</span>) <span class="op">//</span> TPB)</span>
 <span id="cb50-3"><a href="#cb50-3"></a>    <span class="cf">for</span> j, i <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">range</span>(<span class="dv">0</span>, a.shape[<span class="op">-</span><span class="dv">1</span>], TPB)):</span>
 <span id="cb50-4"><a href="#cb50-4"></a>        out[j] <span class="op">=</span> a[i : i <span class="op">+</span> TPB].<span class="bu">sum</span>()</span>
@@ -1167,7 +1340,7 @@ cookieconsent.run({
 <span id="cb50-84"><a href="#cb50-84"></a>    spec<span class="op">=</span>sum_spec,</span>
 <span id="cb50-85"><a href="#cb50-85"></a>)</span>
 <span id="cb50-86"><a href="#cb50-86"></a>problem.check()</span>
-<span id="cb50-87"><a href="#cb50-87"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb50-87"><a href="#cb50-87"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # Sum (Simple)
@@ -1185,8 +1358,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="d135c436" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:12.952086Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:12.951284Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:13.930108Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:13.929175Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:12.952042Z&quot;}" data-trusted="true" data-execution_count="127">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>SIZE <span class="op">=</span> <span class="dv">15</span></span>
+<div id="d135c436" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:12.952086Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:12.951284Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:13.930108Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:13.929175Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:12.952042Z&quot;}}" data-trusted="true" data-execution_count="127">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>SIZE <span class="op">=</span> <span class="dv">15</span></span>
 <span id="cb52-2"><a href="#cb52-2"></a>out <span class="op">=</span> np.zeros((SIZE <span class="op">-</span> <span class="dv">1</span>) <span class="op">//</span> TPB <span class="op">+</span> <span class="dv">1</span>)</span>
 <span id="cb52-3"><a href="#cb52-3"></a>inp <span class="op">=</span> np.arange(SIZE)</span>
 <span id="cb52-4"><a href="#cb52-4"></a>problem <span class="op">=</span> CudaProblem(</span>
@@ -1200,7 +1373,7 @@ cookieconsent.run({
 <span id="cb52-12"><a href="#cb52-12"></a>    spec<span class="op">=</span>sum_spec,</span>
 <span id="cb52-13"><a href="#cb52-13"></a>)</span>
 <span id="cb52-14"><a href="#cb52-14"></a>problem.check()</span>
-<span id="cb52-15"><a href="#cb52-15"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb52-15"><a href="#cb52-15"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # Sum (Full)
@@ -1218,8 +1391,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="66679427" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:13.931535Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:13.931238Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:14.874101Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:14.873115Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:13.931503Z&quot;}" data-trusted="true" data-execution_count="128">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a><span class="co"># My comment: additional test to check the visualisation</span></span>
+<div id="66679427" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:13.931535Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:13.931238Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:14.874101Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:14.873115Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:13.931503Z&quot;}}" data-trusted="true" data-execution_count="128">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a><span class="co"># My comment: additional test to check the visualisation</span></span>
 <span id="cb54-2"><a href="#cb54-2"></a>SIZE <span class="op">=</span> <span class="dv">14</span></span>
 <span id="cb54-3"><a href="#cb54-3"></a>out <span class="op">=</span> np.zeros((SIZE <span class="op">-</span> <span class="dv">1</span>) <span class="op">//</span> TPB <span class="op">+</span> <span class="dv">1</span>)</span>
 <span id="cb54-4"><a href="#cb54-4"></a>inp <span class="op">=</span> np.arange(SIZE)</span>
@@ -1234,7 +1407,7 @@ cookieconsent.run({
 <span id="cb54-13"><a href="#cb54-13"></a>    spec<span class="op">=</span>sum_spec,</span>
 <span id="cb54-14"><a href="#cb54-14"></a>)</span>
 <span id="cb54-15"><a href="#cb54-15"></a>problem.check()</span>
-<span id="cb54-16"><a href="#cb54-16"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb54-16"><a href="#cb54-16"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # Sum (Full)
@@ -1252,8 +1425,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="653c9afb" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:14.875738Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:14.875431Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:16.286079Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:16.285172Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:14.875706Z&quot;}" data-trusted="true" data-execution_count="129">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a><span class="co"># My comment: additional test to check that the code generalizes to</span></span>
+<div id="653c9afb" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:14.875738Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:14.875431Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:16.286079Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:16.285172Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:14.875706Z&quot;}}" data-trusted="true" data-execution_count="129">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a><span class="co"># My comment: additional test to check that the code generalizes to</span></span>
 <span id="cb56-2"><a href="#cb56-2"></a><span class="co"># 3 blocks or more</span></span>
 <span id="cb56-3"><a href="#cb56-3"></a>SIZE <span class="op">=</span> <span class="dv">23</span></span>
 <span id="cb56-4"><a href="#cb56-4"></a>out <span class="op">=</span> np.zeros((SIZE <span class="op">-</span> <span class="dv">1</span>) <span class="op">//</span> TPB <span class="op">+</span> <span class="dv">1</span>)</span>
@@ -1269,7 +1442,7 @@ cookieconsent.run({
 <span id="cb56-14"><a href="#cb56-14"></a>    spec<span class="op">=</span>sum_spec,</span>
 <span id="cb56-15"><a href="#cb56-15"></a>)</span>
 <span id="cb56-16"><a href="#cb56-16"></a>problem.check()</span>
-<span id="cb56-17"><a href="#cb56-17"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb56-17"><a href="#cb56-17"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # Sum (Full)
@@ -1291,8 +1464,8 @@ cookieconsent.run({
 <section id="puzzle-13---axis-sum" class="level2">
 <h2 class="anchored" data-anchor-id="puzzle-13---axis-sum">Puzzle 13 - Axis Sum</h2>
 <p>Implement a kernel that computes a sum over each column of <code>a</code> and stores it in <code>out</code>.</p>
-<div id="0db2ad9c" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:16.288077Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:16.287763Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:18.078569Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:18.077607Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:16.288043Z&quot;}" data-trusted="true" data-execution_count="130">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a><span class="kw">def</span> sum_spec(a):</span>
+<div id="0db2ad9c" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:14:16.288077Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:14:16.287763Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:14:18.078569Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:14:18.077607Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:14:16.288043Z&quot;}}" data-trusted="true" data-execution_count="130">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a><span class="kw">def</span> sum_spec(a):</span>
 <span id="cb58-2"><a href="#cb58-2"></a>    out <span class="op">=</span> np.zeros((a.shape[<span class="dv">0</span>], (a.shape[<span class="dv">1</span>] <span class="op">+</span> TPB <span class="op">-</span> <span class="dv">1</span>) <span class="op">//</span> TPB))</span>
 <span id="cb58-3"><a href="#cb58-3"></a>    <span class="cf">for</span> j, i <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">range</span>(<span class="dv">0</span>, a.shape[<span class="op">-</span><span class="dv">1</span>], TPB)):</span>
 <span id="cb58-4"><a href="#cb58-4"></a>        out[..., j] <span class="op">=</span> a[..., i : i <span class="op">+</span> TPB].<span class="bu">sum</span>(<span class="op">-</span><span class="dv">1</span>)</span>
@@ -1352,7 +1525,7 @@ cookieconsent.run({
 <span id="cb58-58"><a href="#cb58-58"></a>    spec<span class="op">=</span>sum_spec,</span>
 <span id="cb58-59"><a href="#cb58-59"></a>)</span>
 <span id="cb58-60"><a href="#cb58-60"></a>problem.check()</span>
-<span id="cb58-61"><a href="#cb58-61"></a>problem.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb58-61"><a href="#cb58-61"></a>problem.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # Axis Sum
@@ -1375,8 +1548,8 @@ cookieconsent.run({
 <h2 class="anchored" data-anchor-id="puzzle-14---matrix-multiply">Puzzle 14 - Matrix Multiply!</h2>
 <p>Implement a kernel that multiplies square matrices <code>a</code> and <code>b</code> and stores the result in <code>out</code>.</p>
 <p><em>Tip: The most efficient algorithm here will copy a block into shared memory before computing each of the individual row-column dot products. This is easy to do if the matrix fits in shared memory. Do that case first. Then update your code to compute a partial dot-product and iteratively move the part you copied into shared memory.</em> You should be able to do the hard case in 6 global reads.</p>
-<div id="e60cf91d" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:18:07.334715Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:18:07.334017Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:18:08.034466Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:18:08.033413Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:18:07.334677Z&quot;}" data-trusted="true" data-execution_count="134">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a><span class="kw">def</span> matmul_spec(a, b):</span>
+<div id="e60cf91d" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:18:07.334715Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:18:07.334017Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:18:08.034466Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:18:08.033413Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:18:07.334677Z&quot;}}" data-trusted="true" data-execution_count="134">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a><span class="kw">def</span> matmul_spec(a, b):</span>
 <span id="cb60-2"><a href="#cb60-2"></a>    <span class="cf">return</span> a <span class="op">@</span> b</span>
 <span id="cb60-3"><a href="#cb60-3"></a></span>
 <span id="cb60-4"><a href="#cb60-4"></a></span>
@@ -1436,7 +1609,7 @@ cookieconsent.run({
 <span id="cb60-58"><a href="#cb60-58"></a>    spec<span class="op">=</span>matmul_spec,</span>
 <span id="cb60-59"><a href="#cb60-59"></a>)</span>
 <span id="cb60-60"><a href="#cb60-60"></a>problem.check()</span>
-<span id="cb60-61"><a href="#cb60-61"></a>problem.show(sparse<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb60-61"><a href="#cb60-61"></a>problem.show(sparse<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # Matmul (Simple)
@@ -1454,8 +1627,8 @@ cookieconsent.run({
 </div>
 </div>
 </div>
-<div id="cell-63" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:18:08.036569Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:18:08.036258Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:18:22.358536Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:18:22.357073Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:18:08.036538Z&quot;}" data-trusted="true" data-execution_count="135">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a>SIZE <span class="op">=</span> <span class="dv">8</span></span>
+<div id="cell-63" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2024-09-07T12:18:08.036569Z&quot;,&quot;iopub.status.busy&quot;:&quot;2024-09-07T12:18:08.036258Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-09-07T12:18:22.358536Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-09-07T12:18:22.357073Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-09-07T12:18:08.036538Z&quot;}}" data-trusted="true" data-execution_count="135">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a>SIZE <span class="op">=</span> <span class="dv">8</span></span>
 <span id="cb62-2"><a href="#cb62-2"></a>out <span class="op">=</span> np.zeros((SIZE, SIZE))</span>
 <span id="cb62-3"><a href="#cb62-3"></a>inp1 <span class="op">=</span> np.arange(SIZE <span class="op">*</span> SIZE).reshape((SIZE, SIZE))</span>
 <span id="cb62-4"><a href="#cb62-4"></a>inp2 <span class="op">=</span> np.arange(SIZE <span class="op">*</span> SIZE).reshape((SIZE, SIZE)).T</span>
@@ -1471,7 +1644,7 @@ cookieconsent.run({
 <span id="cb62-14"><a href="#cb62-14"></a>    spec<span class="op">=</span>matmul_spec,</span>
 <span id="cb62-15"><a href="#cb62-15"></a>)</span>
 <span id="cb62-16"><a href="#cb62-16"></a>problem.check()</span>
-<span id="cb62-17"><a href="#cb62-17"></a>problem.show(sparse<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb62-17"><a href="#cb62-17"></a>problem.show(sparse<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Passed Tests!
 # Matmul (Full)
@@ -1495,43 +1668,71 @@ cookieconsent.run({
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
     }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
@@ -1539,184 +1740,184 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       }
       return codeEl.innerText;
     }
-  });
-  clipboard.on('success', function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  });
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
-      }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
     });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
     }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
         }
-        return container.innerHTML
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -1724,185 +1925,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

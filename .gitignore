@@ -167,3 +167,5 @@ cython_debug/
 **/cubic-spline-interpolation-exercise-local.ipynb
 **/.DS_Store
 .vscode
+
+**/*.quarto_ipynb
