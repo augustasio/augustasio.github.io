@@ -31,7 +31,6 @@
   font-size: 1.2rem !important;
   line-height: 1;
   vertical-align: middle;
-  transform: translateY(-1px);
 }
 
 /* Force the navbar to span the full viewport width — attempts to eliminate
